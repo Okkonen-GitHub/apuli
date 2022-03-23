@@ -1,7 +1,14 @@
 use std::fs;
-use std::env::current_dir;
+use std::env::{current_dir, args};
 use std::path::PathBuf;
 
+
+const ALLOWED_KEYS: [char; 28] = [
+    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K',
+    'L', 'Ö', 'Ä', 'Z', 'X', 'C', 'V', 'B', 'N', 'M',
+];
+const ALLOWED_NUMS : [char; 6] = ['0', '1', '2', '3', '4', '5'];
+#[derive(Debug)]
 struct Letter {
     letter: char,
     positions: Option<Vec<usize>>,
@@ -22,6 +29,12 @@ fn check_blues(blues: &Vec<Letter>, guess: &String) -> bool {
             }
         }
         pos += 1;
+    }
+    // one blue must be in the word though
+    for blue in blues.iter() {
+        if !guess.contains(blue.letter) {
+            return false;
+        }
     }
     true
 }
@@ -48,7 +61,7 @@ fn check_oranges(oranges: &Vec<Letter>, guess: &String) -> bool {
             return false;
         }
         for pos in orange.positions.as_ref().unwrap().iter() {
-            if guess.get(*pos..*pos+1).unwrap() != orange.letter.to_string() {
+            if guess.chars().nth(*pos).unwrap() != orange.letter {
                 return false;
             }
         }
@@ -109,47 +122,177 @@ fn all_words(base_path: PathBuf, word_len: usize) -> Vec<String> {
     words
 }
 
-fn query(path: PathBuf) {
-    let mut words = all_words(path, 5);
+fn query(path: PathBuf, grays: Vec<Letter>, blues: Option<&Vec<Letter>>, oranges: Option<&Vec<Letter>>, word_lenght: usize) {
+    let mut words = all_words(path, word_lenght);
     
-    let oranges = vec![
-        Letter {
-            letter: 'A',
-            positions: Some(vec![0,1]),
-        },
-    ];
-    let blues = vec![
-        Letter {
-            letter: 'L',
-            positions: Some(vec![4]),
-        },
-    ];
-    let grays = vec![
-        Letter {
-            letter: 'Ö',
-            positions: None,
-        },
-        Letter {
-            letter: 'Ä',
-            positions: None,
-        },
-        Letter {
-            letter: 'Y',
-            positions: None,
-        },
-        Letter {
-            letter: 'U',
-            positions: None,
-        },
-    ];
-
     words = remove_grey(words, grays);
-    words = remove_others(words, Some(&oranges), Some(&blues));
-    println!("{:#?}", words);
+    match oranges {
+        Some(oranges) => {
+            words = remove_others(words, Some(&oranges), None);
+        },
+        None => {
+
+        }
+    };
+    match blues {
+        Some(blues) => {
+            words = remove_others(words.clone(), None, Some(&blues));
+        },
+        None => {
+
+        }
+    };
+    for word in &words {
+        println!("{}", word);
+    }
+    println!("Määrä: {}", words.len());
 }
 
 fn main() {
+
+    let mut grays = Vec::new();
+    let mut blues = Some(Vec::new());
+    let mut oranges = Some(Vec::new());
+
+    let mut args = args().skip(1);
+    let word_length;
+    match args.next() {
+        Some(n) => {
+            if n == "-5".to_string() {
+                word_length = 5;
+            } else if n == "-6".to_string() {
+                word_length = 6;
+            } else {
+                println!("Invalid word length");
+                return;
+            }
+        },
+        _ => {panic!("Invalid word length")}
+    }
+
+    if args.next() == Some("-g".to_string()) {
+        let grays_str: String = args.next().expect("No grays given");
+        for c in grays_str.chars() {
+            if !ALLOWED_KEYS.contains(&c.to_uppercase().next().unwrap()) {
+                panic!("Invalid argument: {}", c);
+            } else {
+                grays.push(Letter {
+                    letter: c.to_uppercase().next().unwrap(),
+                    positions: None,
+                });
+            }
+        }
+    }
+    if args.next() == Some("-b".to_string()) {
+        let blues_str: String = args.next().expect("No blues given");
+        for c in blues_str.chars() {
+            if !ALLOWED_KEYS.contains(&c.to_uppercase().next().unwrap()) && c != ':' && !ALLOWED_NUMS.contains(&c) {
+                panic!("Invalid argument: {}", c);
+            }
+        }
+        let mut element = blues_str.split(":");
+        loop {
+            let mut positions: Vec<usize> = Vec::new();
+            
+            // println!("{:?}, {:?}", element.next(), element.next());
+            
+            let ltr = element.next();
+            let nums = element.next();
+
+            match ltr {
+                Some(ltr) => {
+                    match nums {
+                        Some(nums) => {
+                            for c in nums.chars() {
+                                if !c.is_numeric() {
+                                    panic!("Invalid argument: {}", c);
+                                } else {
+                                    positions.push(c.to_digit(10).unwrap() as usize);
+                                }
+                            }
+                            blues.as_mut().unwrap().push(Letter {
+                                letter: ltr.chars().next().unwrap().to_uppercase().next().unwrap(),
+                                positions: Some(positions),
+                            });
+                        },
+                        None => break,
+                    }
+                },
+                None => break,
+            }
+        }
+    }
+    if args.next() == Some("-o".to_string()) {
+        let oranges_str: String = args.next().expect("No blues given");
+        for c in oranges_str.chars() {
+            if !ALLOWED_KEYS.contains(&c.to_uppercase().next().unwrap()) && c != ':' && !ALLOWED_NUMS.contains(&c) {
+                panic!("Invalid argument: {}", c);
+            }
+        }
+        let mut element = oranges_str.split(":");
+        loop {
+            let mut positions: Vec<usize> = Vec::new();
+            
+            // println!("{:?}, {:?}", element.next(), element.next());
+            
+            let ltr = element.next();
+            let nums = element.next();
+
+            match ltr {
+                Some(ltr) => {
+                    match nums {
+                        Some(nums) => {
+                            for c in nums.chars() {
+                                if !c.is_numeric() {
+                                    panic!("Invalid argument: {}", c);
+                                } else {
+                                    positions.push(c.to_digit(10).unwrap() as usize);
+                                }
+                            }
+                            oranges.as_mut().unwrap().push(Letter {
+                                letter: ltr.chars().next().unwrap().to_uppercase().next().unwrap(),
+                                positions: Some(positions),
+                            });
+                        },
+                        None => break,
+                    }
+                },
+                None => break,
+            }
+        }
+    }
+    // println!("grays {:#?}", grays);
+    // println!("blues {:#?}", blues);
+    // println!("oranges {:#?}", oranges);
     let path = current_dir().unwrap();
     // get input and then query
-    query(path);
+    if oranges.as_mut().unwrap().len() == 0 {
+        oranges = None;
+    }
+    if blues.as_mut().unwrap().len() == 0 {
+        blues = None;
+    }
+    match &oranges {
+        Some(oranges) => {
+            match &blues {
+                Some(blues) => {
+                    query(path, grays, Some(blues), Some(oranges), word_length);
+                },
+                None => {
+                    query(path, grays, None, Some(oranges), word_length);
+                }
+            }
+        }
+        None => {
+            match &blues {
+                Some(blues) => {
+                    query(path, grays, Some(&blues), None, word_length);
+                },
+                None => {
+                    query(path, grays, None, None, word_length);
+                }
+            }
+        }
+    };
+
 }
