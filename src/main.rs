@@ -4,7 +4,6 @@ use std::path::PathBuf;
 
 struct Letter {
     letter: char,
-    color: usize, // 0 = Gray, 1 = Blue, 2 = Orange
     positions: Option<Vec<usize>>,
 }
 
@@ -59,16 +58,40 @@ fn check_oranges(oranges: &Vec<Letter>, guess: &String) -> bool {
 
 fn remove_grey(mut words: Vec<String>, grays: Vec<Letter>) -> Vec<String> {
     for gray in grays.iter() {
-        let mut pos = 0;
         for word in words.clone().iter() {
             if word.contains(gray.letter) {
-                println!("sanat: {:?}, sana: {}, pos: {pos}", words, word);
-                words.remove(pos);
-                println!("sanat: {:?}, sana: {}, pos: {pos}", words, word);
+                // println!("sanat: {:?}, sana: {}, pos: {pos}", words, word);
+                words.remove(words.iter().position(|x| x == word).unwrap());
+                // println!("sanat: {:?}, sana: {}, pos: {pos}", words, word);
                 // pos -= 1;
-            } else {
-                pos += 1;
             }
+        }
+    }
+    words
+}
+
+// removes all of the other invalid words
+fn remove_others(mut words: Vec<String>, oranges: Option<&Vec<Letter>>, blues: Option<&Vec<Letter>>) -> Vec<String> {
+    match oranges {
+        Some(oranges) => {
+            for word in words.clone().iter() {
+                if !check_oranges(oranges, word) {
+                    words.remove(words.iter().position(|x| x == word).unwrap());
+                }
+            }
+        },
+        None => {}
+    };
+    match blues {
+        Some(blues) => {
+            for word in words.clone().iter() {
+                if !check_blues(blues, word) {
+                    words.remove(words.iter().position(|x| x == word).unwrap());
+                }
+            }
+        },
+        None => {
+            return words;
         }
     }
     words
@@ -86,44 +109,47 @@ fn all_words(base_path: PathBuf, word_len: usize) -> Vec<String> {
     words
 }
 
-fn query() {
+fn query(path: PathBuf) {
+    let mut words = all_words(path, 5);
+    
     let oranges = vec![
         Letter {
             letter: 'A',
-            color: 2,
             positions: Some(vec![0,1]),
         },
+    ];
+    let blues = vec![
         Letter {
-            letter: 'O',
-            color: 2,
+            letter: 'L',
             positions: Some(vec![4]),
         },
     ];
-    let guess = "AALTO".to_string();
-    println!("{}",check_oranges(&oranges, &guess));
-    // first remove the greys
-    // then check oranges, then blues
-    let words = vec!["PULLO".to_string(), "JÄNIS".to_string(), "AALTO".to_string(), "AMMUU".to_string(), "ÄÄLIÖ".to_string(), "VÄÄRÄ".to_string()];
     let grays = vec![
         Letter {
-            letter: 'A',
-            color: 0,
-            positions: None
+            letter: 'Ö',
+            positions: None,
         },
         Letter {
-            letter: 'O',
-            color: 0,
+            letter: 'Ä',
+            positions: None,
+        },
+        Letter {
+            letter: 'Y',
+            positions: None,
+        },
+        Letter {
+            letter: 'U',
             positions: None,
         },
     ];
-    let words = remove_grey(words, grays);
-    println!("{:?}", words);
+
+    words = remove_grey(words, grays);
+    words = remove_others(words, Some(&oranges), Some(&blues));
+    println!("{:#?}", words);
 }
 
 fn main() {
     let path = current_dir().unwrap();
-    let words = all_words(path, 5);
-    println!("{:?}", words.last().unwrap());
     // get input and then query
-    query();
+    query(path);
 }
