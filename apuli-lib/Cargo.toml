@@ -1,5 +1,5 @@
 [package]
-name = "apuli"
+name = "apuli-lib"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,17 +7,10 @@ edition = "2021"
 
 [dependencies]
 
-[workspace]
-members = [
-    "apuli-cli",
-    "apuli-lib",
-    "apuli-ui",
-]
-
 [profile.release]
+opt-level = 3
 lto = true
 debug = false
 codegen-units = 1
-opt-level = 3
-debug-assertions = false
 strip = true
+debug-assertions = false
