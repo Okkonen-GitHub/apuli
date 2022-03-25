@@ -10,7 +10,8 @@ pub enum Msg {
     Enter,
     Backspace,
     ChangeWordLenght,
-    UpdateColor(u8, u8)
+    UpdateColor(u8, u8),
+    Clear,
 }
 
 struct App {
@@ -66,20 +67,24 @@ impl Component for App {
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::KeyPress(key) => {
-                println!("{}", key);
+                web_sys::console::log_1(&format!("{}", key).into());
             },
             Msg::Enter => {
-                println!("Enter");
+                web_sys::console::log_1(&"Enter".into());
             },
             Msg::Backspace => {
-                println!("Backspace");
+                web_sys::console::log_1(&"Backspace".into());
             },
             Msg::ChangeWordLenght => {
+                web_sys::console::log_1(&"Change word len".into());
                 println!("ChangeWordLenght");
             },
             Msg::UpdateColor(color, pos) => {
-                println!("UpdateColor: {} at {}", color, pos);
-            }
+                web_sys::console::log_1(&format!("color: {} at {}", color, pos).into());
+            },
+            Msg::Clear => {
+                println!("Clear");
+            },
         }
         true
     }
