@@ -3,7 +3,7 @@ use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{window, Window};
 
 mod components;
-use crate::components::{manager::*, keyboard::Keyboard};
+use crate::components::{manager::*, keyboard::Keyboard, board::Board, game::Game};
 
 use apuli_lib::apuli::ALLOWED_KEYS;
 
@@ -106,12 +106,20 @@ impl Component for App {
         let keyboard_state: Vec<char> = ALLOWED_KEYS.iter().map(|c| *c).collect();
                
         html! {
-            <Keyboard
-            callback={link.callback(move |msg| msg)}
-            message={"hellou".to_string()}
-            word={"hello".to_string()}
-            keyboard={keyboard_state}
-            />
+            <div class={classes!("game", "dark")}>
+                <div class="board-container">
+                    <Board
+                        guesses={vec![[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec()]}
+                        word_length={5}
+                    />
+                </div>
+                <Keyboard
+                    callback={link.callback(move |msg| msg)}
+                    message={"hellou".to_string()}
+                    word={"hello".to_string()}
+                    keyboard={keyboard_state}
+                />
+            </div>
         }
     }
 }
