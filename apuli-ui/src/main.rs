@@ -3,7 +3,7 @@ use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{window, Window};
 
 mod components;
-use crate::components::manager::*;
+use crate::components::{manager::*, keyboard::Keyboard};
 
 use apuli_lib::apuli::ALLOWED_KEYS;
 
@@ -102,8 +102,16 @@ impl Component for App {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        let link = ctx.link();
+        let keyboard_state: Vec<char> = ALLOWED_KEYS.iter().map(|c| *c).collect();
+               
         html! {
-            <p> { "Hello, world!" } </p>
+            <Keyboard
+                callback={link.callback(move |msg| msg)}
+                message={"hellou".to_string()}
+                word={"hello".to_string()}
+                keyboard={keyboard_state}
+            />
         }
     }
 }
