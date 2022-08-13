@@ -17,5 +17,12 @@ impl InputLoop {
         }
         self
     }
+    // removes the last character from the InputLoop (backspace)
+    pub fn remove_char(&mut self) -> &mut InputLoop {
+        if self.current.len() != 0 {
+            self.current.pop();
+        }
+        self
+    }
     
 }

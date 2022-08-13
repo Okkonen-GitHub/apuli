@@ -76,25 +76,29 @@ impl Component for App {
                 web_sys::console::log_1(&format!("{}", key).into());
                 self.input_handler.insert_char(key);
                 web_sys::console::log_1(&format!("{:?}", self.input_handler.current).into());
-                self.currect_game.guesses.remove(0);
-                self.currect_game.guesses.push(self.input_handler.current.clone())
-                // self.currect_game.guesses.insert(0, self.input_handler.current.clone())
+                self.currect_game.update_guesses(&self.input_handler);
             },
             Msg::Enter => {
                 web_sys::console::log_1(&"Enter".into());
+                if self.input_handler.current.len() == self.currect_game.word_length && self.currect_game.current_guess < 5 {
+                    self.currect_game.current_guess += 1;
+                    self.input_handler.current.clear() // who would want to insert the same word twice?
+                } // TODO: go to the beginning maybe
+                
             },
             Msg::Backspace => {
                 web_sys::console::log_1(&"Backspace".into());
+                self.input_handler.remove_char();
+                self.currect_game.update_guesses(&self.input_handler);
             },
             Msg::ChangeWordLenght => {
                 web_sys::console::log_1(&"Change word len".into());
-                println!("ChangeWordLenght");
             },
             Msg::UpdateTile(tile) => {
                 web_sys::console::log_1(&format!("tile: {:?}", tile).into());
             },
             Msg::Clear => {
-                println!("Clear");
+                println!("Clear"); // maybe just reload the page?
             },
         }
         true
@@ -120,6 +124,7 @@ impl Component for App {
                     <Board
                         guesses={self.currect_game.guesses.clone()} // clone for now..?
                         word_length={self.currect_game.word_length}
+                        current_guess={self.currect_game.current_guess}
                     
                     
                         // guesses={vec![[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec()]}
