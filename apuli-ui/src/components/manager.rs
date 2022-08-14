@@ -39,7 +39,9 @@ impl TileManager {
             TileState::Blue => { tile.state = TileState::Orange },
             TileState::Orange => { tile.state = TileState::Black },
         }
-        self.tiles.push(tile);
+        if tile.state != TileState::Black { // no black tiles to the list?
+            self.tiles.push(tile);
+        } 
     }
 
     pub fn new() -> Self {
