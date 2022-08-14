@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use yew::prelude::*;
 use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{window, Window};
@@ -20,6 +22,7 @@ struct App {
     keyboard_listener: Option<Closure<dyn Fn(KeyboardEvent)>>,
     input_handler: InputLoop,
     currect_game: Game,
+    tile_manager: TileManager,
 }
 
 impl Component for App {
@@ -31,6 +34,7 @@ impl Component for App {
             keyboard_listener: None,
             input_handler: InputLoop::new(5, Vec::new()),
             currect_game: Game::new(),
+            tile_manager: TileManager::new(),
         }
     }
 
@@ -73,9 +77,9 @@ impl Component for App {
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::KeyPress(key) => {
-                web_sys::console::log_1(&format!("{}", key).into());
+
                 self.input_handler.insert_char(key);
-                web_sys::console::log_1(&format!("{:?}", self.input_handler.current).into());
+                //web_sys::console::log_1(&format!("{:?}", self.input_handler.current).into());
                 self.currect_game.update_guesses(&self.input_handler);
             },
             Msg::Enter => {
@@ -83,7 +87,7 @@ impl Component for App {
                 if self.input_handler.current.len() == self.currect_game.word_length && self.currect_game.current_guess < 5 {
                     self.currect_game.current_guess += 1;
                     self.input_handler.current.clear() // who would want to insert the same word twice?
-                } // TODO: go to the beginning maybe
+                } // TODO: go to the beginning maybe, or show the results?
                 
             },
             Msg::Backspace => {
@@ -95,10 +99,14 @@ impl Component for App {
                 web_sys::console::log_1(&"Change word len".into());
             },
             Msg::UpdateTile(tile) => {
-                web_sys::console::log_1(&format!("tile: {:?}", tile).into());
+                //web_sys::console::log_1(&format!("tile: {:?}", tile).into());
+                self.tile_manager.update_tile(tile)
             },
             Msg::Clear => {
                 println!("Clear"); // maybe just reload the page?
+                self.currect_game = Game::new(); // I guess replacing the game state with the
+                // default game state works?
+                self.input_handler.current.clear(); // gotta remember to clear the input loop
             },
         }
         true
@@ -124,11 +132,8 @@ impl Component for App {
                     <Board
                         guesses={self.currect_game.guesses.clone()} // clone for now..?
                         word_length={self.currect_game.word_length}
-                        current_guess={self.currect_game.current_guess}
-                    
-                    
-                        // guesses={vec![[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec()]}
-                        // word_length={5}
+                        cb={link.callback(move |msg| msg)}
+                        tile_states={self.tile_manager.clone()}
                     />
                 </div>
                 <Keyboard
@@ -140,6 +145,10 @@ impl Component for App {
             </div>
         }
     }
+}
+
+pub fn cprint(m: impl Debug) -> () {
+    web_sys::console::log_1(&format!("{:?}", m).into());
 }
 
 fn main() {

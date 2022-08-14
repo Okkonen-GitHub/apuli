@@ -1,8 +1,24 @@
-use crate::components::game::Game;
+use crate::Msg;
 use yew::prelude::*;
+use crate::cprint;
+use super::manager::*;
+
+use super::manager::TileManager;
+//use crate::components::manager::*;
+//use web_sys::console;
+
+#[derive(Properties, PartialEq)]
+pub struct Props {
+    pub guesses: Vec<Vec<char>>,
+    pub word_length: usize,
+    pub cb: Callback<Msg>,
+    pub tile_states: TileManager
+}
 
 #[function_component(Board)]
-pub fn board(props: &Game) -> Html {
+pub fn board(props: &Props) -> Html {
+    let tiles = &props.tile_states.tiles;
+    //let guesses = props.clone().guesses;
     html! {
         <>
             <div class={classes!("board-6")}>
@@ -15,9 +31,34 @@ pub fn board(props: &Game) -> Html {
                                         let c = guess
                                         .get(index)
                                         .unwrap_or(&' ');
+                                        let character = c.clone();
+                                        let callback = props.cb.clone();
+                                        let mut state: String = "".into();
 
+                                        let mut new_state = TileState::Black;
+                                        cprint(tiles);
+                                        for tile in tiles {
+                                            if tile.character == *c && &tile.position == &index {
+                                                match tile.state {
+                                                    TileState::Black => {state = "".into()},
+                                                    TileState::Gray => {state = "absent".into()},
+                                                    TileState::Blue => {state = "present".into()},
+                                                    TileState::Orange => {state = "correct".into()}
+                                                }
+                                                new_state = tile.state.clone();
+                                            }
+                                            
+                                        }
+                                        
                                         html! {
-                                            <div class="tile">
+                                            <div class={format!("tile {}", state)} onclick={Callback::from(move |e: MouseEvent| {
+                                                e.prevent_default();
+                                                
+                                                let tile_state = new_state.clone();
+                                                callback.emit(Msg::UpdateTile(
+                                                    Tile { state: tile_state, position: index, character: character }
+                                                ));
+                                            })}>
                                                 { *c }
                                             </div>
                                         }
