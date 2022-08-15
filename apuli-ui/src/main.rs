@@ -141,6 +141,7 @@ impl Component for App {
                     message={"hellou".to_string()}
                     word={"hello".to_string()}
                     keyboard={keyboard_state}
+                    is_guessing={self.currect_game.is_ready}
                 />
             </div>
         }
