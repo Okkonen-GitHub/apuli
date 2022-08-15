@@ -93,9 +93,7 @@ pub fn keyboard(props: &Props) -> Html {
                     }).collect::<Html>()
                 }
                 {
-                    //TODO FIX
-                    // if props.is_guessing {
-                    if true {
+                    if !props.is_guessing {
                         let callback = props.callback.clone();
                         let onmousedown = Callback::from(move |e: MouseEvent| {
                             e.prevent_default();
@@ -105,20 +103,20 @@ pub fn keyboard(props: &Props) -> Html {
                         html! {
                             <button data-nosnippet="" class={classes!("keyboard-button", "keyboard-button-submit")}
                                 onmousedown={onmousedown}>
-                                { "ARVAA" }
+                                { "ENTER" }
                             </button>
                         }
                     } else {
                         let callback = props.callback.clone();
                         let onmousedown = Callback::from(move |e: MouseEvent| {
                             e.prevent_default();
-                            callback.emit(Msg::Clear);
+                            callback.emit(Msg::Enter);
                         });
 
                         html! {
                             <button data-nosnippet="" class={classes!("keyboard-button", "keyboard-button-submit", "correct")}
                                 onmousedown={onmousedown}>
-                                { "UUSI?" }
+                                { "VALMIS" }
                             </button>
                         }
                     }
