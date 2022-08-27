@@ -26,12 +26,12 @@ pub mod apuli {
     }
 
     trait Removal {
-        fn remove_grey(&mut self, grays: Vec<Letter>) -> Self;
+        fn remove_grey(&mut self, grays: &Vec<Letter>) -> Self;
         fn remove_others(&mut self, blues: Option<&Vec<Letter>>, oranges: Option<&Vec<Letter>>) -> Self;
     }
 
     impl Removal for Vec<String> {
-        fn remove_grey(&mut self, grays: Vec<Letter>) -> Self {
+        fn remove_grey(&mut self, grays: &Vec<Letter>) -> Self {
             for gray in grays.iter() {
                 for word in self.clone().iter() {
                     if word.contains(gray.letter) {
@@ -178,8 +178,8 @@ pub mod apuli {
         words
     }
 
-    pub fn query(grays: Vec<Letter>, blues: Option<&Vec<Letter>>, oranges: Option<&Vec<Letter>>, word_lenght: usize) -> Vec<String> {
-        let path = PathBuf::from("../../apuli-lib/");
+    pub fn query(grays: &Vec<Letter>, blues: Option<&Vec<Letter>>, oranges: Option<&Vec<Letter>>, word_lenght: usize) -> Vec<String> {
+        let path = PathBuf::from("../apuli-lib/");
         println!("{:?}", path);
         let mut words = all_words(path, word_lenght);
         

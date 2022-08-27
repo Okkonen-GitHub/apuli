@@ -89,9 +89,11 @@ impl Component for App {
                     let blues = mngr.gen_blues(oranges.as_ref());
                     let grays = mngr.gen_grays();
                     
-                    let result = query(grays, blues.as_ref(), oranges.as_ref(), self.currect_game.word_length);
+                    let result = query(grays.as_ref(), blues.as_ref(), oranges.as_ref(), self.currect_game.word_length);
 
-                    cprint(result); cprint("hihiihihi"); cprint(&oranges); 
+                    cprint(result); cprint("hihiihihi"); cprint(&oranges);
+                    cprint("grays"); cprint(grays);
+                    cprint("blues"); cprint(&blues);
 
 
                 } else if self.input_handler.current.len() == self.currect_game.word_length && self.currect_game.current_guess < 5 {
