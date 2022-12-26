@@ -17,7 +17,6 @@ pub struct Props {
     pub word: String,
 
     pub keyboard: Vec<char>,
-    pub is_guessing: bool,
 }
 
 #[function_component(Keyboard)]
@@ -93,30 +92,17 @@ pub fn keyboard(props: &Props) -> Html {
                     }).collect::<Html>()
                 }
                 {
-                    if !props.is_guessing {
+                    {
                         let callback = props.callback.clone();
                         let onmousedown = Callback::from(move |e: MouseEvent| {
                             e.prevent_default();
-                            callback.emit(Msg::Enter);
+                            callback.emit(Msg::Enter(false));
                         });
 
                         html! {
                             <button data-nosnippet="" class={classes!("keyboard-button", "keyboard-button-submit")}
                                 onmousedown={onmousedown}>
                                 { "ENTER" }
-                            </button>
-                        }
-                    } else {
-                        let callback = props.callback.clone();
-                        let onmousedown = Callback::from(move |e: MouseEvent| {
-                            e.prevent_default();
-                            callback.emit(Msg::Enter);
-                        });
-
-                        html! {
-                            <button data-nosnippet="" class={classes!("keyboard-button", "keyboard-button-submit", "correct")}
-                                onmousedown={onmousedown}>
-                                { "VALMIS" }
                             </button>
                         }
                     }
