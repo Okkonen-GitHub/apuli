@@ -1,6 +1,5 @@
 use crate::Msg;
 use yew::prelude::*;
-use crate::cprint;
 use super::manager::*;
 
 use super::manager::TileManager;
@@ -12,31 +11,34 @@ pub struct Props {
     pub guesses: Vec<Vec<char>>,
     pub word_length: usize,
     pub cb: Callback<Msg>,
-    pub tile_states: TileManager
+    pub tile_states: TileManager,
+    pub current_guess: usize,
 }
 
 #[function_component(Board)]
 pub fn board(props: &Props) -> Html {
     let tiles = &props.tile_states.tiles;
+
     //let guesses = props.clone().guesses;
     html! {
         <>
             <div class={classes!("board-6")}>
                 {
-                    props.guesses.iter().map(|guess|{
+                    props.guesses.iter().map(|guess| {
                         html! {
                             <div class={format!("row-{}", props.word_length)}>
                                 {
                                     (0..props.word_length).map(|index| {
                                         let c = guess
-                                        .get(index)
-                                        .unwrap_or(&' ');
+                                            .get(index)
+                                            .unwrap_or(&' ');
+
                                         let character = c.clone();
                                         let callback = props.cb.clone();
                                         let mut state: String = "".into();
 
                                         let mut new_state = TileState::Black;
-                                        cprint(tiles);
+                                        // cprint(tiles);
                                         for tile in tiles {
                                             if tile.character == *c && &tile.position == &index {
                                                 match tile.state {
@@ -69,6 +71,7 @@ pub fn board(props: &Props) -> Html {
                                     }).collect::<Html>()
 
                                 }
+
                             </div>
                         }
                     }).collect::<Html>()

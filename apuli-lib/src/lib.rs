@@ -10,8 +10,9 @@ mod tests {
 }
 
 pub mod apuli {
-    use std::fs;
-    use std::path::PathBuf;
+
+    const WORDS_6: &str = include_str!("../6_letter_words.txt");
+    const WORDS_5: &str = include_str!("../5_letter_words.txt");
 
 
     pub const ALLOWED_KEYS: [char; 28] = [
@@ -167,22 +168,29 @@ pub mod apuli {
     //     words
     // }
 
-    fn all_words(base_path: PathBuf, word_len: usize) -> Vec<String> {
-        let file = fs::read_to_string(base_path.join(format!("{}_letter_words.txt", word_len)));
+    fn all_words(word_len: usize) -> Vec<String> {
         let mut words = Vec::new();
-        if let Ok(file) = file {
-            for line in file.lines() {
-                words.push(line.to_owned())
-            }
+        match word_len {
+            5 => {
+                for word in WORDS_5.split("\n") {
+                    words.push(word.to_owned())
+                }
+            },
+            6 => {
+                for word in WORDS_6.split("\n") {
+                    words.push(word.to_owned())
+                }
+            },
+            _ => {unreachable!()}
         }
         words
     }
 
     pub fn query(grays: &Vec<Letter>, blues: Option<&Vec<Letter>>, oranges: Option<&Vec<Letter>>, word_lenght: usize) -> Vec<String> {
-        let path = PathBuf::from("../apuli-lib/");
-        println!("{:?}", path);
-        let mut words = all_words(path, word_lenght);
-        
+        // let path = PathBuf::from("../apuli-lib/");
+        // println!("{:?}", path);
+        let mut words = all_words(word_lenght);
+
         words.remove_grey(grays);
         match oranges {
             Some(oranges) => {
