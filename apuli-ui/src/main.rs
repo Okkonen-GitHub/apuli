@@ -36,7 +36,7 @@ struct App {
     tile_manager: TileManager,
     is_help_visible: bool,
     is_answer_visible: bool,
-    is_menu_visible: bool
+    is_menu_visible: bool,
 }
 
 impl Component for App {
@@ -47,7 +47,7 @@ impl Component for App {
         Self {
             keyboard_listener: None,
             input_handler: InputLoop::new(5, Vec::new()),
-            currect_game: Game::new(),
+            currect_game: Game::new(5),
             tile_manager: TileManager::new(),
             is_help_visible: false,
             is_answer_visible: false,
@@ -120,17 +120,16 @@ impl Component for App {
                 self.currect_game.update_guesses(&self.input_handler);
             }
             Msg::ChangeWordLength(word_length) => {
-                self.currect_game.word_length = word_length;
-                self.input_handler.word_len = word_length;
+                self.input_handler.word_len = word_length; //we don't want it to remember old stuff
+                self.input_handler.current.clear(); // so it automatically clears all the state
+                self.tile_manager.tiles.clear();
+                self.currect_game = Game::new(word_length);
             }
-            Msg::UpdateTile(tile) => {
-                //web_sys::console::log_1(&format!("tile: {:?}", tile).into());
-                self.tile_manager.update_tile(tile)
-            }
+            Msg::UpdateTile(tile) => self.tile_manager.update_tile(tile),
             Msg::Clear => {
                 println!("Clear"); // maybe just reload the page?
-                self.currect_game = Game::new(); // I guess replacing the game state with the
-                                                 // default game state works?
+                self.currect_game = Game::new(self.currect_game.word_length); // I guess replacing the game state with the
+                                                                              // default game state works?
                 self.input_handler.current.clear(); // gotta remember to clear the input loop
                 self.tile_manager.tiles.clear(); // also gotta remember to clear tilestates
             }
@@ -202,7 +201,7 @@ impl Component for App {
                                 callback={link.callback(move |msg| msg)}
                                 word_length={self.currect_game.word_length}
                             />
-                        } 
+                        }
                     } else {
                         html! {}
                     }
