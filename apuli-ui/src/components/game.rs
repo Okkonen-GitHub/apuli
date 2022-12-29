@@ -1,5 +1,7 @@
 use yew::Properties;
 
+use std::fmt;
+
 use super::{input::InputLoop, manager::TileManager};
 
 #[derive(Clone, PartialEq, Properties)]
@@ -8,6 +10,23 @@ pub struct Game {
     pub guesses: Vec<Vec<char>>,
     pub current_guess: usize,
     pub tile_manager: TileManager,
+    pub theme: Theme,
+}
+
+
+#[derive(Clone, PartialEq, Copy)]
+pub enum Theme {
+    Dark,
+    Colorblind,
+}
+
+impl fmt::Display for Theme {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Theme::Dark => write!(f, "dark"),
+            Theme::Colorblind => write!(f, "colorblind"),
+        }
+    }
 }
 
 impl Game {
@@ -19,6 +38,7 @@ impl Game {
                 .collect::<Vec<_>>(),
             current_guess: 0,
             tile_manager: TileManager::new(),
+            theme: Theme::Dark,
         }
     }
     pub fn update_guesses(&mut self, input_handler: &InputLoop) -> &Game {
