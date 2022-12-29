@@ -1,12 +1,19 @@
 use std::fmt::Debug;
 
 use components::elements::AnswerModal;
-use yew::prelude::*;
 use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{window, Window};
+use yew::prelude::*;
 
 mod components;
-use crate::components::{manager::*, keyboard::Keyboard, board::Board, game::*, input::InputLoop, elements::{ToggleButton, ClearButton, Header, HelpModal}};
+use crate::components::{
+    board::Board,
+    elements::{ClearButton, Header, HelpModal, ToggleButton},
+    game::*,
+    input::InputLoop,
+    keyboard::Keyboard,
+    manager::*,
+};
 
 use apuli_lib::apuli::ALLOWED_KEYS;
 
@@ -84,46 +91,54 @@ impl Component for App {
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::KeyPress(key) => {
-
                 self.input_handler.insert_char(key);
                 //web_sys::console::log_1(&format!("{:?}", self.input_handler.current).into());
                 self.currect_game.update_guesses(&self.input_handler);
-            },
+            }
             Msg::Enter => {
-                if self.input_handler.current.len() == self.currect_game.word_length && self.currect_game.current_guess < 5 {
+                if self.input_handler.current.len() == self.currect_game.word_length
+                    && self.currect_game.current_guess < 5
+                {
                     self.currect_game.current_guess += 1;
-                    self.input_handler.current = self.currect_game.guesses.get(self.currect_game.current_guess).unwrap().to_vec();
-                } else if self.currect_game.current_guess == 5 && self.input_handler.current.len() == self.currect_game.word_length {
+                    self.input_handler.current = self
+                        .currect_game
+                        .guesses
+                        .get(self.currect_game.current_guess)
+                        .unwrap()
+                        .to_vec();
+                } else if self.currect_game.current_guess == 5
+                    && self.input_handler.current.len() == self.currect_game.word_length
+                {
                     self.currect_game.current_guess = 0;
                     self.input_handler.current = self.currect_game.guesses.get(0).unwrap().to_vec();
                 }
-            },
+            }
             Msg::Backspace => {
                 self.input_handler.remove_char();
                 self.currect_game.update_guesses(&self.input_handler);
-            },
+            }
             Msg::ChangeWordLenght => {
                 web_sys::console::log_1(&"Change word len".into());
-            },
+            }
             Msg::UpdateTile(tile) => {
                 //web_sys::console::log_1(&format!("tile: {:?}", tile).into());
                 self.tile_manager.update_tile(tile)
-            },
+            }
             Msg::Clear => {
                 println!("Clear"); // maybe just reload the page?
                 self.currect_game = Game::new(); // I guess replacing the game state with the
-                // default game state works?
+                                                 // default game state works?
                 self.input_handler.current.clear(); // gotta remember to clear the input loop
                 self.tile_manager.tiles.clear(); // also gotta remember to clear tilestates
-            },
+            }
             Msg::ToggleHelp => {
                 self.is_help_visible = !self.is_help_visible;
                 self.is_answer_visible = false;
-            },
+            }
             Msg::ToggleAnswer => {
                 self.is_answer_visible = !self.is_answer_visible;
                 self.is_help_visible = false;
-            },
+            }
         }
         true
     }
@@ -167,7 +182,7 @@ impl Component for App {
                                 callback={link.callback(move |msg| msg) }
                                 tile_manager={self.tile_manager.clone()}
                                 word_length={self.currect_game.word_length}
-                
+
                             />
                         }
                     } else {

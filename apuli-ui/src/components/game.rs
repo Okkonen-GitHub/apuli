@@ -14,7 +14,14 @@ impl Game {
     pub fn new() -> Self {
         Self {
             word_length: 5,
-            guesses: vec![[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec()],
+            guesses: vec![
+                [' '; 5].to_vec(),
+                [' '; 5].to_vec(),
+                [' '; 5].to_vec(),
+                [' '; 5].to_vec(),
+                [' '; 5].to_vec(),
+                [' '; 5].to_vec(),
+            ],
             current_guess: 0,
             tile_manager: TileManager::new(),
         }
@@ -24,7 +31,5 @@ impl Game {
         self.guesses.remove(index);
         self.guesses.insert(index, input_handler.current.clone());
         self
-
     }
 }
-

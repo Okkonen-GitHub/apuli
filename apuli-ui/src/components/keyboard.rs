@@ -3,7 +3,6 @@ use yew::prelude::*;
 // use crate::components::manager::TileState;
 use crate::Msg;
 
-
 const KEYBOARD_0: [char; 10] = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'];
 const KEYBOARD_1: [char; 11] = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ö', 'Ä'];
 const KEYBOARD_2: [char; 7] = ['Z', 'X', 'C', 'V', 'B', 'N', 'M'];
@@ -11,7 +10,6 @@ const KEYBOARD_2: [char; 7] = ['Z', 'X', 'C', 'V', 'B', 'N', 'M'];
 #[derive(Properties, PartialEq)]
 pub struct Props {
     pub callback: Callback<Msg>,
-
 
     pub message: String,
     pub word: String,

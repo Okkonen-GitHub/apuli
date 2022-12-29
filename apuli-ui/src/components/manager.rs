@@ -3,9 +3,8 @@ use std::collections::HashMap;
 
 #[derive(PartialEq, Clone)]
 pub struct TileManager {
-    pub tiles: Vec<Tile>
+    pub tiles: Vec<Tile>,
 }
-
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum TileState {
@@ -21,12 +20,12 @@ pub struct Tile {
     pub character: char,
 }
 
-
 impl TileManager {
-
     pub fn update_tile(&mut self, mut tile: Tile) -> () {
-        if tile.character == ' ' {return;} // do nothing if the character is blank
-        
+        if tile.character == ' ' {
+            return;
+        } // do nothing if the character is blank
+
         for (index, managed_tile) in self.tiles.clone().iter().enumerate() {
             if managed_tile.position == tile.position && managed_tile.character == tile.character {
                 self.tiles.remove(index);
@@ -34,12 +33,13 @@ impl TileManager {
         }
 
         match tile.state {
-            TileState::Black => { tile.state = TileState::Gray }
-            TileState::Gray => { tile.state = TileState::Blue },
-            TileState::Blue => { tile.state = TileState::Orange },
-            TileState::Orange => { tile.state = TileState::Black },
+            TileState::Black => tile.state = TileState::Gray,
+            TileState::Gray => tile.state = TileState::Blue,
+            TileState::Blue => tile.state = TileState::Orange,
+            TileState::Orange => tile.state = TileState::Black,
         }
-        if tile.state != TileState::Black { // no black tiles to the list?
+        if tile.state != TileState::Black {
+            // no black tiles to the list?
             self.tiles.push(tile);
         }
     }
@@ -76,19 +76,18 @@ impl TileManager {
     pub fn gen_blues(&mut self, oranges: Option<&Vec<Letter>>) -> Option<Vec<Letter>> {
         let mut blues = Vec::new();
         let mut cache: HashMap<char, Vec<usize>> = HashMap::new();
-        
+
         // first the "ominous" ones
         for (index, tile) in self.tiles.clone().iter().enumerate() {
             if let Some(oranges) = oranges {
                 for orange in oranges {
                     if tile.state == TileState::Gray && tile.character == orange.letter {
-                        let mut positions = vec![0,1,2,3,4];
+                        let mut positions = vec![0, 1, 2, 3, 4];
                         let mut positions_to_be_removed = Vec::new();
                         for pos in positions.clone() {
                             if orange.positions.as_ref().unwrap().contains(&pos) {
                                 positions_to_be_removed.push(pos)
                             }
-                            
                         }
                         positions.retain(|i| !positions_to_be_removed.contains(i));
                         let blue = Letter {
@@ -111,7 +110,10 @@ impl TileManager {
             }
         }
         for (k, v) in cache {
-            blues.push(Letter { letter: k, positions: Some(v) })
+            blues.push(Letter {
+                letter: k,
+                positions: Some(v),
+            })
         }
         if !blues.is_empty() {
             return Some(blues);
@@ -132,14 +134,17 @@ impl TileManager {
                     cache.insert(tile.character, positions.to_vec());
                 } else {
                     cache.insert(tile.character, vec![tile.position]); //TODO I don't think
-                    // positions are needed here so passing None would be fine, or actually using a
-                    // vec could be enough
+                                                                       // positions are needed here so passing None would be fine, or actually using a
+                                                                       // vec could be enough
                 }
                 // self.tiles.remove(index);
             }
         }
         for (k, v) in cache {
-            grays.push(Letter { letter: k, positions: Some(v) })
+            grays.push(Letter {
+                letter: k,
+                positions: Some(v),
+            })
         }
         grays
     }
@@ -147,5 +152,4 @@ impl TileManager {
     pub fn new() -> Self {
         Self { tiles: vec![] }
     }
-    
 }
