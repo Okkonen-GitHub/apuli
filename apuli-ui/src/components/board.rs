@@ -48,7 +48,7 @@ pub fn board(props: &Props) -> Html {
                                                     TileState::Orange => {state = "correct".into()}
                                                 }
                                                 new_state = tile.state.clone();
-                                            } if tile.character == *c && tile.state == TileState::Gray {
+                                            } else if tile.character == *c && tile.state == TileState::Gray && state == "" {
                                                 state = "absent".into();
                                                 new_state = TileState::Gray;
                                             }
