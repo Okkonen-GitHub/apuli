@@ -96,7 +96,7 @@ pub fn keyboard(props: &Props) -> Html {
                         let callback = props.callback.clone();
                         let onmousedown = Callback::from(move |e: MouseEvent| {
                             e.prevent_default();
-                            callback.emit(Msg::Enter(false));
+                            callback.emit(Msg::Enter);
                         });
 
                         html! {

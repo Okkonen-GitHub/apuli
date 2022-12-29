@@ -83,12 +83,14 @@ impl TileManager {
                 for orange in oranges {
                     if tile.state == TileState::Gray && tile.character == orange.letter {
                         let mut positions = vec![0,1,2,3,4];
+                        let mut positions_to_be_removed = Vec::new();
                         for pos in positions.clone() {
                             if orange.positions.as_ref().unwrap().contains(&pos) {
-                                positions.remove(pos);
+                                positions_to_be_removed.push(pos)
                             }
                             
                         }
+                        positions.retain(|i| !positions_to_be_removed.contains(i));
                         let blue = Letter {
                             letter: tile.character,
                             positions: Some(positions),
@@ -129,7 +131,9 @@ impl TileManager {
                     positions.push(tile.position);
                     cache.insert(tile.character, positions.to_vec());
                 } else {
-                    cache.insert(tile.character, vec![tile.position]);
+                    cache.insert(tile.character, vec![tile.position]); //TODO I don't think
+                    // positions are needed here so passing None would be fine, or actually using a
+                    // vec could be enough
                 }
                 // self.tiles.remove(index);
             }
