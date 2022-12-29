@@ -8,7 +8,7 @@ use yew::prelude::*;
 mod components;
 use crate::components::{
     board::Board,
-    elements::{ClearButton, Header, HelpModal, ToggleButton},
+    elements::{ClearButton, Header, HelpModal, MenuModal, ToggleButton},
     game::*,
     input::InputLoop,
     keyboard::Keyboard,
@@ -21,11 +21,12 @@ pub enum Msg {
     KeyPress(char),
     Enter,
     Backspace,
-    ChangeWordLenght,
+    ChangeWordLength(usize),
     UpdateTile(Tile),
     Clear,
     ToggleAnswer,
     ToggleHelp,
+    ToggleMenu,
 }
 
 struct App {
@@ -35,6 +36,7 @@ struct App {
     tile_manager: TileManager,
     is_help_visible: bool,
     is_answer_visible: bool,
+    is_menu_visible: bool
 }
 
 impl Component for App {
@@ -49,6 +51,7 @@ impl Component for App {
             tile_manager: TileManager::new(),
             is_help_visible: false,
             is_answer_visible: false,
+            is_menu_visible: false,
         }
     }
 
@@ -56,7 +59,6 @@ impl Component for App {
         if !first_render {
             return;
         }
-        println!("Rendered");
         let window: Window = window().expect("window not available");
 
         let cb = ctx.link().batch_callback(|e: KeyboardEvent| {
@@ -117,8 +119,9 @@ impl Component for App {
                 self.input_handler.remove_char();
                 self.currect_game.update_guesses(&self.input_handler);
             }
-            Msg::ChangeWordLenght => {
-                web_sys::console::log_1(&"Change word len".into());
+            Msg::ChangeWordLength(word_length) => {
+                self.currect_game.word_length = word_length;
+                self.input_handler.word_len = word_length;
             }
             Msg::UpdateTile(tile) => {
                 //web_sys::console::log_1(&format!("tile: {:?}", tile).into());
@@ -134,9 +137,16 @@ impl Component for App {
             Msg::ToggleHelp => {
                 self.is_help_visible = !self.is_help_visible;
                 self.is_answer_visible = false;
+                self.is_menu_visible = false;
             }
             Msg::ToggleAnswer => {
                 self.is_answer_visible = !self.is_answer_visible;
+                self.is_help_visible = false;
+                self.is_menu_visible = false;
+            }
+            Msg::ToggleMenu => {
+                self.is_menu_visible = !self.is_menu_visible;
+                self.is_answer_visible = false;
                 self.is_help_visible = false;
             }
         }
@@ -161,7 +171,7 @@ impl Component for App {
             <div class={classes!("game", "dark")}>
                 <Header
                     on_toggle_help_cb={link.callback(|_| Msg::ToggleHelp)}
-                    on_toggle_answer_cb={link.callback(|_| Msg::ToggleAnswer)}
+                    on_toggle_answer_cb={link.callback(|_| Msg::ToggleMenu)}
                     title={"Apuli"}
                 />
                 <div class="board-container">
@@ -185,6 +195,14 @@ impl Component for App {
 
                             />
                         }
+                    }
+                    else if self.is_menu_visible {
+                        html! {
+                            <MenuModal
+                                callback={link.callback(move |msg| msg)}
+                                word_length={self.currect_game.word_length}
+                            />
+                        } 
                     } else {
                         html! {}
                     }

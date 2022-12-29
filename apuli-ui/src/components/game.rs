@@ -14,14 +14,9 @@ impl Game {
     pub fn new() -> Self {
         Self {
             word_length: 5,
-            guesses: vec![
-                [' '; 5].to_vec(),
-                [' '; 5].to_vec(),
-                [' '; 5].to_vec(),
-                [' '; 5].to_vec(),
-                [' '; 5].to_vec(),
-                [' '; 5].to_vec(),
-            ],
+            guesses: std::iter::repeat(Vec::with_capacity(5))
+                        .take(6)
+                        .collect::<Vec<_>>(),
             current_guess: 0,
             tile_manager: TileManager::new(),
         }

@@ -132,7 +132,7 @@ pub struct AnswerModalProps {
 }
 
 #[function_component(AnswerModal)]
-pub fn anser_modal(props: &AnswerModalProps) -> Html {
+pub fn answer_modal(props: &AnswerModalProps) -> Html {
     let callback = props.callback.clone();
     let toggle_answer = onmousedown!(callback, Msg::ToggleAnswer);
 
@@ -159,6 +159,45 @@ pub fn anser_modal(props: &AnswerModalProps) -> Html {
 
             }
 
+        </div>
+    }
+}
+
+
+#[derive(Properties, Clone, PartialEq)]
+pub struct MenuModalProps {
+    pub callback: Callback<Msg>,
+    pub word_length: usize,
+}
+
+#[function_component(MenuModal)]
+pub fn menu_modal(props: &MenuModalProps) -> Html {
+    let callback = props.callback.clone();
+    let toggle_menu = onmousedown!(callback, Msg::ToggleMenu);
+
+    let change_word_length_5 = onmousedown!(callback, Msg::ChangeWordLength(5));
+    let change_word_length_6 = onmousedown!(callback, Msg::ChangeWordLength(6));
+
+    
+    html! {
+        <div class="modal">
+            <span onmousedown={toggle_menu} class="modal-close">{"✖"}</span>
+                <div>
+                    <label class="label">{"Sanulien pituus:"}</label>
+                    <div class="select-container">
+                        <button class={classes!("select", (props.word_length == 5).then(|| Some("select-active")))}
+                                onmousedown={change_word_length_5}>
+                            {"5 merkkiä"}
+                            </button>
+                        <button class={classes!("select", (props.word_length == 6).then(|| Some("select-active")))}
+                                onmousedown={change_word_length_6}>
+                            {"6 merkkiä"}
+                        </button>
+                    </div>
+                </div>
+            <div class="version">
+                <a class="version" href={"https://github.com/okkonen-github/apuli"} target="_blank">{"Apuli-dev"}</a>
+            </div>
         </div>
     }
 }

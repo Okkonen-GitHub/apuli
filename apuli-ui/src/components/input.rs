@@ -1,6 +1,6 @@
 #[derive(Debug)]
 pub struct InputLoop {
-    word_len: usize,
+    pub word_len: usize,
     pub current: Vec<char>,
 }
 
