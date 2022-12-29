@@ -11,10 +11,3 @@ wasm-bindgen = "0.2.79"
 web-sys = "0.3.56"
 apuli-lib = {path = "../apuli-lib"}
 
-[profile.release]
-opt-level = "z"
-lto = true
-debug = false
-codegen-units = 1
-strip = true
-debug-assertions = false
