@@ -48,7 +48,7 @@ impl Component for App {
         Self {
             keyboard_listener: None,
             input_handler: InputLoop::new(5, Vec::new()),
-            currect_game: Game::new(5),
+            currect_game: Game::new(5, Theme::Dark),
             tile_manager: TileManager::new(),
             is_help_visible: false,
             is_answer_visible: false,
@@ -128,13 +128,13 @@ impl Component for App {
                 self.input_handler.word_len = word_length; //we don't want it to remember old stuff
                 self.input_handler.current.clear(); // so it automatically clears all the state
                 self.tile_manager.tiles.clear();
-                self.currect_game = Game::new(word_length);
+                self.currect_game = Game::new(word_length, self.currect_game.theme);
                 self.is_menu_visible = false;
             }
             Msg::UpdateTile(tile) => self.tile_manager.update_tile(tile),
             Msg::Clear => {
                 println!("Clear"); // maybe just reload the page?
-                self.currect_game = Game::new(self.currect_game.word_length); // I guess replacing the game state with the
+                self.currect_game = Game::new(self.currect_game.word_length, self.currect_game.theme); // I guess replacing the game state with the
                                                                               // default game state works?
                 self.input_handler.current.clear(); // gotta remember to clear the input loop
                 self.tile_manager.tiles.clear(); // also gotta remember to clear tilestates

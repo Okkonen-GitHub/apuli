@@ -30,7 +30,7 @@ impl fmt::Display for Theme {
 }
 
 impl Game {
-    pub fn new(word_len: usize) -> Self {
+    pub fn new(word_len: usize, current_theme: Theme) -> Self {
         Self {
             word_length: word_len,
             guesses: std::iter::repeat(Vec::with_capacity(word_len))
@@ -38,7 +38,7 @@ impl Game {
                 .collect::<Vec<_>>(),
             current_guess: 0,
             tile_manager: TileManager::new(),
-            theme: Theme::Dark,
+            theme: current_theme,
         }
     }
     pub fn update_guesses(&mut self, input_handler: &InputLoop) -> &Game {

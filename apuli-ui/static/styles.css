@@ -72,6 +72,11 @@ hr {
     color: var(--text);
 }
 
+.answer-modal {
+    position: sticky;
+    float: right;
+}
+
 .example {
     height: 40px;
     max-width: 200px;

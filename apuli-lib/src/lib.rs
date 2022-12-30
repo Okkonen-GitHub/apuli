@@ -10,6 +10,8 @@ mod tests {
 }
 
 pub mod apuli {
+    use std::ops::Deref;
+
 
     const WORDS_6: &str = include_str!("../6_letter_words.txt");
     const WORDS_5: &str = include_str!("../5_letter_words.txt");
@@ -26,16 +28,99 @@ pub mod apuli {
         pub positions: Option<Vec<usize>>,
     }
 
+    trait ContainsN {
+        // Returns true if string contains n amount of specified letter
+        fn contains_n(&self, letter: &char, n: usize) -> bool;
+        // Returns true if string contains AT LEAST n amount of specified letter
+        fn contains_atleast_n(&self, letter: &char, n: usize) -> bool;
+    }
+
+    impl ContainsN for String {
+        fn contains_n(&self, letter: &char, n: usize) -> bool {
+            let mut count = 0;
+            for ltr in self.chars() {
+                if &ltr == letter {
+                    count += 1;
+                }
+            }
+            count == n
+        }
+        
+        fn contains_atleast_n(&self, letter: &char, n: usize) -> bool {
+            let mut count = 0;
+            for ltr in self.chars() {
+                if &ltr == letter {
+                    count += 1;
+                }
+            }
+            count >= n
+        }
+    }
+
     trait Removal {
-        fn remove_grey(&mut self, grays: &Vec<Letter>) -> Self;
+        fn remove_grey(&mut self, grays: &Vec<Letter>, blues: Option<&Vec<Letter>>, oranges: Option<&Vec<Letter>>) -> Self;
         fn remove_others(&mut self, blues: Option<&Vec<Letter>>, oranges: Option<&Vec<Letter>>) -> Self;
     }
 
     impl Removal for Vec<String> {
-        fn remove_grey(&mut self, grays: &Vec<Letter>) -> Self {
+        fn remove_grey(&mut self, grays: &Vec<Letter>, blues: Option<&Vec<Letter>>, oranges: Option<&Vec<Letter>>) -> Self {
             for gray in grays.iter() {
+                let mut is_ominous = false;
                 for word in self.clone().iter() {
-                    if word.contains(gray.letter) {
+                    if let Some(blues) = blues {
+                        let mut known_count = 0;
+                        for blue in blues {
+                            if let Some(oranges) = oranges {
+                                // is_ominous = true;
+                                for orange in oranges {
+                                    if orange.letter == gray.letter {
+                                        is_ominous = true;
+                                        known_count += orange.positions.as_ref().unwrap().len();
+                                    }
+                                    if blue.letter == gray.letter {
+                                        is_ominous = true;
+                                        known_count += 1;
+                                    }
+                                    if known_count != 0 && !word.contains_atleast_n(&blue.letter, known_count) {
+                                        dbg!(word, known_count, blue.letter);
+                                        if let Some(index) = self.iter().position(|x| x == word) {
+                                            self.remove(index); // the word might have already been
+                                        // removed earlier so we have to check in this (latter)
+                                        // case
+                                        }
+
+                                        //self.remove(self.iter().position(|x| x == word).unwrap());
+                                    }
+                                    known_count = 0;
+                                }
+                            } else {
+                                if blue.letter == gray.letter {
+                                    is_ominous = true;
+                                    known_count += 1;
+                                }
+                                if known_count != 0 && !word.contains_atleast_n(&blue.letter, known_count) {
+                                    dbg!(word, known_count, blue.letter);
+                                    self.remove(self.iter().position(|x| x == word).unwrap());
+                                }
+                            }
+                            known_count = 0;
+                        }
+
+                    } else if let Some(oranges) = oranges {
+                        for orange in oranges {
+                            if orange.letter == gray.letter {
+                                is_ominous = true;
+                                if !word.contains_n(&orange.letter, orange.positions.as_ref().unwrap().len()) {
+                                    if let Some(index) = self.iter().position(|x| x == word) {
+                                        self.remove(index); // the word might have already been
+                                        // removed earlier so we have to check in this (latter)
+                                        // case
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if !is_ominous && word.contains(gray.letter) {
                         // println!("sanat: {:?}, sana: {}, pos: {pos}", words, word);
                         self.remove(self.iter().position(|x| x == word).unwrap());
                         // println!("sanat: {:?}, sana: {}, pos: {pos}", words, word);
@@ -88,7 +173,7 @@ pub mod apuli {
             }
             pos += 1;
         }
-        // one blue must be in the word though
+        // at least n number of blues must be in the word though
         for blue in blues.iter() {
             if !guess.contains(blue.letter) {
                 return false;
@@ -191,7 +276,7 @@ pub mod apuli {
         // println!("{:?}", path);
         let mut words = all_words(word_lenght);
 
-        words.remove_grey(grays);
+        words.remove_grey(grays, blues, oranges);
         match oranges {
             Some(oranges) => {
                 words.remove_others(Some(&oranges), None);
