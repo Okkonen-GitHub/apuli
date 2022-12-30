@@ -77,7 +77,9 @@ pub mod apuli {
                                         is_ominous = true;
                                         known_count += orange.positions.as_ref().unwrap().len();
                                     }
-                                    if blue.letter == gray.letter {
+                                    // if we know the count based on oranges, it is already correct
+                                    else if blue.letter == gray.letter {
+
                                         is_ominous = true;
                                         known_count += 1;
                                     }
