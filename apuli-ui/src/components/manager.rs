@@ -73,12 +73,12 @@ impl TileManager {
     }
     // oranges must be generated first
     // generates a list of blues and converts "ominous" grays into blues
-    pub fn gen_blues(&mut self, oranges: Option<&Vec<Letter>>) -> Option<Vec<Letter>> {
+    pub fn gen_blues(&mut self /*, oranges: Option<&Vec<Letter>>*/) -> Option<Vec<Letter>> {
         let mut blues = Vec::new();
         let mut cache: HashMap<char, Vec<usize>> = HashMap::new();
 
         // first the "ominous" ones
-        for (index, tile) in self.tiles.clone().iter().enumerate() {
+        for tile in self.tiles.clone().iter() {
             // if let Some(oranges) = oranges {
             //     for orange in oranges {
             //         if tile.state == TileState::Gray && tile.character == orange.letter {

@@ -1,9 +1,40 @@
 # Apuli - sanuli auttaja
 
-toteutettu pelkästään rust ohjelmointikielellä.
+Auttaja sovellus [sanuli.fi](https://sanuli.fi) peliä varten
+
+Katso [Apuli-ui/NOTICE.MD](./apuli-ui/NOTICE.MD)
 
 
-## Käyttöohje
+## Apuli-ui
+
+Tarvitset ainakin trunk:in ja sen vaatimat jutut, jotka saat seuraavasti
+
+```
+rustup target add wasm32-unknown-unknown
+cargo install --locked trunk
+cargo install wasm-bindgen-cli
+```
+
+
+Käynnistä paikallinen Apuli julkaisu
+
+```shell
+trunk serve --release
+```
+
+Tai vaihtoehtoisesti käynnistä paikallinen kehitys palvelin
+
+```shell
+trunk serve
+```
+Tai paketoi sovellus
+
+```shell
+trunk build --release
+```
+
+
+## Apuli-cli Käyttöohje
 
 Käyttäminen on toistaiseksi aika ikävää
 
