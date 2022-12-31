@@ -5,6 +5,12 @@ Auttaja sovellus [sanuli.fi](https://sanuli.fi) peliä varten
 Katso [Apuli-ui/NOTICE.MD](./apuli-ui/NOTICE.MD)
 
 
+# TODO
+
+1. Support for neluli
+1. Ranking system for guesses
+1. Refactoring code
+
 ## Apuli-ui
 
 Tarvitset ainakin trunk:in ja sen vaatimat jutut, jotka saat seuraavasti
