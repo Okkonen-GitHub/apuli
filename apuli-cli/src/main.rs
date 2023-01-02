@@ -126,9 +126,11 @@ fn main() {
     }
 
     let result = query(&grays, blues.as_ref(), oranges.as_ref(), word_length);
+    let ranked = rank(result);
     
-    for word in &result {
-        println!("{}", word);
-    }
-    println!("Määrä: {}", result.len());
+    let _ = ranked.iter().enumerate().for_each(|(index, (score, word))| {
+        // println!("{index}.  {word}  @[{score}]")
+    });
+
+    println!("Määrä: {}", ranked.len());
 }

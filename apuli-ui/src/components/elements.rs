@@ -1,8 +1,8 @@
-use crate::{Msg, cprint};
+use crate::{cprint, Msg};
 use yew::prelude::*;
 
-use super::{manager::TileManager, game::Theme};
-use apuli_lib::apuli::query;
+use super::{game::Theme, manager::TileManager};
+use apuli_lib::apuli::{query, rank};
 
 #[derive(Properties, PartialEq)]
 pub struct ButtonProps {
@@ -147,7 +147,10 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
     let grays = mngr.gen_grays();
 
     let result = query(&grays, blues.as_ref(), oranges.as_ref(), props.word_length);
-    cprint(oranges); cprint(blues); cprint(grays);
+    let ranked = rank(result);
+    cprint(oranges);
+    cprint(blues);
+    cprint(grays);
 
     html! {
         <div class="modal">
@@ -155,15 +158,15 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
             {
             {
 
-                result.iter().map(|word| {
+                ranked.iter().enumerate().map(|(index, (score, word))| {
                     html ! {
-                        <p>{word}</p>
+                        <p>{index}{".  "}{word}{"    (score: "} {score} {" )"}</p>
                     }
                 }).collect::<Html>()
             }
 
             }
-            <p>{"Yhteensä: "} {result.len()} </p>
+            <p>{"Yhteensä: "} {ranked.len()} </p>
 
         </div>
     }

@@ -13,7 +13,6 @@ pub struct Game {
     pub theme: Theme,
 }
 
-
 #[derive(Clone, PartialEq, Copy)]
 pub enum Theme {
     Dark,
@@ -21,7 +20,7 @@ pub enum Theme {
 }
 
 impl fmt::Display for Theme {
-        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Theme::Dark => write!(f, "dark"),
             Theme::Colorblind => write!(f, "colorblind"),

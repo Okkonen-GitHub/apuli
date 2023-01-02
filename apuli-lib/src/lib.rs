@@ -1,13 +1,5 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
-}
-
 pub mod apuli {
+    use std::collections::HashMap;
 
     const WORDS_6: &str = include_str!("../6_letter_words.txt");
     const WORDS_5: &str = include_str!("../5_letter_words.txt");
@@ -28,6 +20,8 @@ pub mod apuli {
         fn contains_n(&self, letter: &char, n: usize) -> bool;
         // Returns true if string contains AT LEAST n amount of specified letter
         fn contains_atleast_n(&self, letter: &char, n: usize) -> bool;
+        // returns how many times a letter appears in a string 
+        fn appearances(&self, letter: &char) -> usize;
     }
 
     impl ContainsN for String {
@@ -49,6 +43,16 @@ pub mod apuli {
                 }
             }
             count >= n
+        }
+
+        fn appearances(&self, letter: &char) -> usize {
+            let mut count = 0;
+            for ltr in self.chars() {
+                if &ltr == letter {
+                    count += 1;
+                }
+            }
+            count
         }
     }
 
@@ -87,23 +91,28 @@ pub mod apuli {
                                         is_ominous = true;
                                         known_count += orange.positions.as_ref().unwrap().len();
                                     }
-                                    // if we know the count based on oranges, it is already correct
+                                    // if we know the count based on oranges, it is already
+                                    // correct, except when it isn't.
+                                    // But to fix this we would need to add row info to the
+                                    // positions for the algorithm.
                                     else if blue.letter == gray.letter {
                                         is_ominous = true;
                                         known_count += 1;
                                     }
                                     if known_count != 0 && is_exact {
-                                        if !word.contains_n(&orange.letter, known_count) {
-                                            if let Some(index) = self.iter().position(|x| x == word) {
+                                        if !word.contains_atleast_n(&orange.letter, known_count) {
+                                            if let Some(index) = self.iter().position(|x| x == word)
+                                            {
                                                 self.remove(index);
                                             }
                                         }
                                     } else if known_count != 0 {
-                                            if !word.contains_atleast_n(&blue.letter, known_count) {
-                                                if let Some(index) = self.iter().position(|x| x == word) {
-                                                    self.remove(index); // the word might have already been
-                                                                        // removed earlier so we have to check in this (latter)
-                                                                        // case
+                                        if !word.contains_atleast_n(&blue.letter, known_count) {
+                                            if let Some(index) = self.iter().position(|x| x == word)
+                                            {
+                                                self.remove(index); // the word might have already been
+                                                                    // removed earlier so we have to check in this (latter)
+                                                                    // case
                                             }
                                         }
                                     }
@@ -228,12 +237,16 @@ pub mod apuli {
         match word_len {
             5 => {
                 for word in WORDS_5.split("\n") {
-                    words.push(word.to_owned())
+                    if !word.is_empty() {
+                        words.push(word.to_owned())
+                    }
                 }
             }
             6 => {
                 for word in WORDS_6.split("\n") {
-                    words.push(word.to_owned())
+                    if !word.is_empty() {
+                        words.push(word.to_owned())
+                    }
                 }
             }
             _ => {
@@ -255,5 +268,41 @@ pub mod apuli {
         words.remove_others(oranges, blues);
 
         words
+    }
+
+    // basically a sorting function
+    pub fn rank(words: Vec<String>) -> Vec<(u16, String)> {
+        let mut letter_frequency = HashMap::new();
+        let mut result = Vec::new();
+
+        for word in &words {
+            for letter in word.chars() {
+                let key = &letter;
+                if letter_frequency.contains_key(key) {
+                    letter_frequency
+                        .insert(key.clone(), letter_frequency.get(&key).unwrap() + 1u16);
+                } else {
+                    letter_frequency.insert(*key, 1);
+                }
+            }
+        }
+
+        for word in words {
+            let mut score = 0;
+            for (ch, val) in &letter_frequency {
+                // doesn't reward words having duplicate letters as much
+                match word.appearances(ch) {
+                    0 => {}
+                    n => {score += *val/(n as u16)}
+                }
+            }
+            result.push((score, word));
+        }
+
+        // sort the vec based on score..
+        // somehow
+        result.sort_unstable_by(|a, b| b.cmp(a));
+
+        result
     }
 }
