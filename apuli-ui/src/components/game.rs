@@ -11,6 +11,13 @@ pub struct Game {
     pub current_guess: usize,
     pub tile_manager: TileManager,
     pub theme: Theme,
+    pub mode: GameMode,
+}
+
+#[derive(Clone, Copy, PartialEq)]
+pub enum GameMode {
+    Sanuli,
+    Neluli,
 }
 
 #[derive(Clone, PartialEq, Copy)]
@@ -29,7 +36,7 @@ impl fmt::Display for Theme {
 }
 
 impl Game {
-    pub fn new(word_len: usize, current_theme: Theme) -> Self {
+    pub fn new(word_len: usize, current_theme: Theme, game_mode: GameMode) -> Self {
         Self {
             word_length: word_len,
             guesses: std::iter::repeat(Vec::with_capacity(word_len))
@@ -38,9 +45,10 @@ impl Game {
             current_guess: 0,
             tile_manager: TileManager::new(),
             theme: current_theme,
+            mode: game_mode
         }
     }
-    pub fn update_guesses(&mut self, input_handler: &InputLoop) -> &Game {
+    pub fn update_guesses(&mut self, input_handler: &InputLoop) -> &Self {
         let index = self.current_guess;
         self.guesses.remove(index);
         self.guesses.insert(index, input_handler.current.clone());

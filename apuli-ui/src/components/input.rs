@@ -8,6 +8,9 @@ impl InputLoop {
     pub fn new(word_len: usize, current: Vec<char>) -> Self {
         Self { word_len, current }
     }
+    pub fn reset(&mut self) {
+        self.current.clear();
+    }
 
     pub fn insert_char(&mut self, key: char) -> &mut InputLoop {
         self.current.push(key);
