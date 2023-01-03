@@ -272,17 +272,21 @@ pub mod apuli {
 
     // basically a sorting function
     pub fn rank(words: Vec<String>) -> Vec<(u16, String)> {
-        let mut letter_frequency = HashMap::new();
+        let mut letter_frequency: HashMap<char, Vec<u16>> = HashMap::new();
         let mut result = Vec::new();
-
+        let word_len = words[0].len();
         for word in &words {
-            for letter in word.chars() {
+            for (position, letter) in word.chars().enumerate() {
                 let key = &letter;
                 if letter_frequency.contains_key(key) {
-                    letter_frequency
-                        .insert(key.clone(), letter_frequency.get(&key).unwrap() + 1u16);
+                    let mut positions: Vec<u16> = letter_frequency.get(key).unwrap().clone();
+                    positions[position] = positions[position] + 1u16;
+                    
+                    letter_frequency.insert(key.clone(), positions.to_vec());
                 } else {
-                    letter_frequency.insert(*key, 1);
+                    let mut positions = vec![0; word_len];
+                    positions[position] = 1;
+                    letter_frequency.insert(*key, positions);
                 }
             }
         }
@@ -291,9 +295,26 @@ pub mod apuli {
             let mut score = 0;
             for (ch, val) in &letter_frequency {
                 // doesn't reward words having duplicate letters as much
-                match word.appearances(ch) {
+                match word.appearances(&ch) {
                     0 => {}
-                    n => {score += *val/(n as u16)}
+                    n => {
+                        // this increases score for potential orange letters
+                        for (index, ltr) in word.chars().enumerate() {
+                            if ltr == *ch {
+                                score += val[index]/(n as u16);
+                                if word == "KASTI" || word == "KAUSI" {
+                                    dbg!(ch, val, &word);
+                                }
+                            }
+                        }
+                        // then we need to increase score for blues 
+                        if word.contains(*ch) {
+                            score += val.iter().sum::<u16>()/(n as u16);
+                            if word == "KASTI" || word == "KAUSI" {
+                                    dbg!(ch, val.iter().sum::<u16>(), &word);
+                            }
+                        }
+                    }
                 }
             }
             result.push((score, word));
