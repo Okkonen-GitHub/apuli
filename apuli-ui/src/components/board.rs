@@ -1,4 +1,4 @@
-use super::manager::*;
+use super::{manager::*, game::GameMode};
 use crate::Msg;
 use yew::prelude::*;
 
@@ -13,16 +13,20 @@ pub struct Props {
     pub cb: Callback<Msg>,
     pub tile_states: TileManager,
     pub current_guess: usize,
+    pub mode: GameMode,
+    pub max_guesses: usize,
+    pub board_index: usize,
 }
 
 #[function_component(Board)]
 pub fn board(props: &Props) -> Html {
     let tiles = &props.tile_states.tiles;
+    let board_index = props.board_index;
 
     //let guesses = props.clone().guesses;
     html! {
         <>
-            <div class={classes!("board-6")}>
+            <div class={classes!(format!("board-{}", props.max_guesses))}>
                 {
                     props.guesses.iter().map(|guess| {
                         html! {
@@ -62,7 +66,8 @@ pub fn board(props: &Props) -> Html {
 
                                                 let tile_state = new_state.clone();
                                                 callback.emit(Msg::UpdateTile(
-                                                    Tile { state: tile_state, position: index, character: character }
+                                                    Tile { state: tile_state, position: index, character: character },
+                                                    board_index
                                                 ));
                                             })}>
                                                 { *c }
