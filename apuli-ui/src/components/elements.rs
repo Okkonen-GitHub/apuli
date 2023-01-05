@@ -1,4 +1,4 @@
-use crate::{cprint, Msg};
+use crate::Msg;
 use yew::prelude::*;
 
 use super::{game::{Theme, GameMode}, manager::TileManager};
@@ -133,42 +133,113 @@ pub fn help_modal(props: &HelpModalProps) -> Html {
 #[derive(Properties, PartialEq)]
 pub struct AnswerModalProps {
     pub callback: Callback<Msg>,
-    pub tile_manager: TileManager,
+    pub tile_manager: Vec<TileManager>,
     pub word_length: usize,
+    pub game_mode: GameMode,
+    pub show_combined: bool,
 }
 
 #[function_component(AnswerModal)]
 pub fn answer_modal(props: &AnswerModalProps) -> Html {
     let callback = props.callback.clone();
     let toggle_answer = onmousedown!(callback, Msg::ToggleAnswer);
-    let mngr = &mut props.tile_manager.clone();
-    let oranges = mngr.gen_oranges();
-    let blues = mngr.gen_blues(/*oranges.as_ref()*/);
-    let grays = mngr.gen_grays();
 
-    let result = query(&grays, blues.as_ref(), oranges.as_ref(), props.word_length);
-    let ranked = rank(result);
-    cprint(oranges);
-    cprint(blues);
-    cprint(grays);
+    let toggle_combined = onmousedown!(callback, Msg::ToggleCombined);
+
+    let mngr = props.tile_manager.clone();
+
 
     html! {
+    <>
         <div class="modal">
-            <span onmousedown={toggle_answer} class="modal-close answer-modal">{"✖"}</span>
-            {
-            {
+            <span onmousedown={toggle_answer} class="modal-close answer-modal">
+                {"✖"}
+            </span>
+            { 
+                if props.game_mode == GameMode::Neluli {
+                    html! {
+                        <>
+                            <div>
+                                <label class="label">{"Yhdistetty?"}</label>
+                                <div class="select-container">
+                                    <button class={classes!("select", (props.show_combined).then(|| Some("select-active")))}
+                                        onmousedown={toggle_combined}>
+                                        {(props.show_combined).then_some("Yhdistetty").unwrap_or("Erikseen")}
+                                    </button>
+                                </div>
+                            </div>
+                        
+                        {{
+                            if !props.show_combined {
+                                html! {
+                                    <div class="neluli-answer">
+                                        {
+                                            (0..4).into_iter().map(|i| {
+                                                html! {
+                                                    <div class="answer-container">
+                                                        {
+                                                            html ! {
+                                                                    {{
+                                                                        let mngr = &mut mngr[i].clone();
+                                                                        let oranges = mngr.gen_oranges();
+                                                                        let blues = mngr.gen_blues(/*oranges.as_ref()*/);
+                                                                        let grays = mngr.gen_grays();
+                                                                        let result = query(&grays, blues.as_ref(), oranges.as_ref(), props.word_length);
+                                                                        let ranked = rank(result);
 
-                ranked.iter().enumerate().map(|(index, (score, word))| {
-                    html ! {
-                        <p>{index}{".  "}{word}{"    (score: "} {score} {" )"}</p>
+                                                                        ranked.iter().enumerate().map(|(index, (score, word))| {
+                                                                            html ! {
+                                                                                <p class="answer">
+                                                                                    {index}{".  "}{word} <wbr/> {format!("  (VR:{score})") }
+                                                                                </p>
+                                                                            }
+                                                                            }).collect::<Html>()
+                                                                    }}
+                                                            }
+                                                        }
+                                                    </div>
+                                                }
+                                            }).collect::<Html>()
+                                        }
+                                    </div>
+                                    }
+                            } else {
+                                
+                                // let mngr = &mut mngr[0].clone();
+                                //             let oranges = mngr.gen_oranges();
+                                //             let blues = mngr.gen_blues(/*oranges.as_ref()*/);
+                                //             let grays = mngr.gen_grays();
+                                //
+                                //             let result = query(&grays, blues.as_ref(), oranges.as_ref(), props.word_length);
+                                //             let ranked = rank(result);
+
+                                html! {<p>{"hi!"}</p>}
+                            }
+                        }}
+                    </>
                     }
-                }).collect::<Html>()
-            }
+                } else { // props.game_mode == GameMode::Sanuli
+                    html! {
+                        {{
+                            let mngr = &mut mngr[0].clone();
+                            let oranges = mngr.gen_oranges();
+                            let blues = mngr.gen_blues(/*oranges.as_ref()*/);
+                            let grays = mngr.gen_grays();
+                            let result = query(&grays, blues.as_ref(), oranges.as_ref(), props.word_length);
+                            let ranked = rank(result);
+
+                            ranked.iter().enumerate().map(|(index, (score, word))| {
+                                        html ! {
+                                            <p>{index}{".  "}{word}{"  (VR: "} {score} {")"}</p>
+                                        }
+                                            }).collect::<Html>()
+                            }}
+                    }
+                }
 
             }
-            <p>{"Yhteensä: "} {ranked.len()} </p>
-
         </div>
+    </>
     }
 }
 
