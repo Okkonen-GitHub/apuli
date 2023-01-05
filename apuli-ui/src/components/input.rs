@@ -12,12 +12,17 @@ impl InputLoop {
         self.current.clear();
     }
 
-    pub fn insert_char(&mut self, key: char) -> &mut InputLoop {
-        self.current.push(key);
-        if self.current.len() > self.word_len {
-            self.current.remove(0); // remove the first character
+    pub fn insert_char(&mut self, key: char)  {
+        //If easy input 
+        if self.current.len() < self.word_len {
+            self.current.push(key);
         }
-        self
+
+        // //If Okko input
+        // self.current.push(key);
+        // if self.current.len() > self.word_len {
+        //     self.current.remove(0); // remove the first character
+        // }
     }
     // removes the last character from the InputLoop (backspace)
     pub fn remove_char(&mut self) -> &mut InputLoop {
