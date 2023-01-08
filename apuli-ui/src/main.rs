@@ -104,7 +104,7 @@ impl Component for App {
             }
             Msg::Enter => {
                 if self.input_handler.current.len() == self.currect_game.word_length
-                    && self.currect_game.current_guess < 5
+                    && self.currect_game.current_guess < self.currect_game.max_guesses()-1
                 {
                     self.currect_game.current_guess += 1;
                     self.input_handler.current = self
@@ -113,7 +113,7 @@ impl Component for App {
                         .get(self.currect_game.current_guess)
                         .unwrap()
                         .to_vec();
-                } else if self.currect_game.current_guess == 5
+                } else if self.currect_game.current_guess == self.currect_game.max_guesses() - 1
                     && self.input_handler.current.len() == self.currect_game.word_length
                 {
                     self.currect_game.current_guess = 0;
