@@ -2,13 +2,15 @@
 
 Auttaja sovellus [sanuli.fi](https://sanuli.fi) peliä varten
 
-Katso [Apuli-ui/NOTICE.MD](./apuli-ui/NOTICE.MD)
+
+## Lähteet ja lisenssit
+[Apuli-ui/NOTICE.MD](NOTICE.MD)
 
 
 # TODO
 
-- [ ] Support for neluli
-- [x] Ranking system for guesses based on information revealed by guess
+- [x] Support for neluli
+- [x] Ranking system for guesses based roughly on information revealed by guess
 - [ ] Refactoring code
 
 ## Apuli-ui

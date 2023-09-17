@@ -357,7 +357,7 @@ pub fn menu_modal(props: &MenuModalProps) -> Html {
                 </div>
 
             <div class="version">
-                <a class="version" href={"https://github.com/okkonen-github/apuli"} target="_blank">{"Apuli-dev"}</a>
+                <a class="version" href={"https://github.com/okkonen-github/apuli"} target="_blank">{"Apuli-dev | lähteet"}</a>
             </div>
         </div>
     }
