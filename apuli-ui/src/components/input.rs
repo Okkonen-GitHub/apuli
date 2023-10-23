@@ -12,8 +12,8 @@ impl InputLoop {
         self.current.clear();
     }
 
-    pub fn insert_char(&mut self, key: char)  {
-        //If easy input 
+    pub fn insert_char(&mut self, key: char) {
+        //If easy input
         if self.current.len() < self.word_len {
             self.current.push(key);
         }
@@ -26,7 +26,7 @@ impl InputLoop {
     }
     // removes the last character from the InputLoop (backspace)
     pub fn remove_char(&mut self) -> &mut InputLoop {
-        if self.current.len() != 0 {
+        if !self.current.is_empty() {
             self.current.pop();
         }
         self
