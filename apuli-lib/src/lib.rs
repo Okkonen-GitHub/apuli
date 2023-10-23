@@ -60,24 +60,24 @@ pub mod apuli {
     trait Removal {
         fn remove_grey(
             &mut self,
-            grays: &Vec<Letter>,
-            blues: Option<&Vec<Letter>>,
-            oranges: Option<&Vec<Letter>>,
+            grays: &[Letter],
+            blues: Option<&[Letter]>,
+            oranges: Option<&[Letter]>,
         ) -> Self;
         fn remove_others(
             &mut self,
             blues: Option<&Vec<Letter>>,
             oranges: Option<&Vec<Letter>>,
         ) -> Self;
-        fn appearances(&self, guess: &String) -> usize;
+        fn appearances(&self, guess: &str) -> usize;
     }
 
     impl Removal for Vec<String> {
         fn remove_grey(
             &mut self,
-            grays: &Vec<Letter>,
-            blues: Option<&Vec<Letter>>,
-            oranges: Option<&Vec<Letter>>,
+            grays: &[Letter],
+            blues: Option<&[Letter]>,
+            oranges: Option<&[Letter]>,
         ) -> Self {
             for gray in grays.iter() {
                 let mut is_ominous = false;
@@ -101,21 +101,20 @@ pub mod apuli {
                                         is_ominous = true;
                                         known_count += 1;
                                     }
-                                    if known_count != 0 && is_exact {
-                                        if !word.contains_atleast_n(&orange.letter, known_count) {
-                                            if let Some(index) = self.iter().position(|x| x == word)
-                                            {
-                                                self.remove(index);
-                                            }
+                                    if known_count != 0
+                                        && is_exact
+                                        && !word.contains_atleast_n(&orange.letter, known_count)
+                                    {
+                                        if let Some(index) = self.iter().position(|x| x == word) {
+                                            self.remove(index);
                                         }
-                                    } else if known_count != 0 {
-                                        if !word.contains_atleast_n(&blue.letter, known_count) {
-                                            if let Some(index) = self.iter().position(|x| x == word)
-                                            {
-                                                self.remove(index); // the word might have already been
-                                                                    // removed earlier so we have to check in this (latter)
-                                                                    // case
-                                            }
+                                    } else if known_count != 0
+                                        && !word.contains_atleast_n(&blue.letter, known_count)
+                                    {
+                                        if let Some(index) = self.iter().position(|x| x == word) {
+                                            self.remove(index); // the word might have already been
+                                                                // removed earlier so we have to check in this (latter)
+                                                                // case
                                         }
                                     }
                                     known_count = 0;
@@ -178,7 +177,7 @@ pub mod apuli {
             }
             self.to_vec()
         }
-        fn appearances(&self, guess: &String) -> usize {
+        fn appearances(&self, guess: &str) -> usize {
             let mut count = 0;
             for word in self.iter() {
                 if word == guess {
@@ -189,20 +188,18 @@ pub mod apuli {
         }
     }
 
-    fn check_blues(blues: &Vec<Letter>, guess: &String) -> bool {
+    fn check_blues(blues: &[Letter], guess: &str) -> bool {
         /*
         *Returns true if some blue is found in the correct position
         Input: "SYÖPÄ", vec![Letter { letter: 'S', color: 1, positions: vec![3,4]}] --> true (sana kelpaa)
         Input: "SYÖPÄ", vec![Letter { letter: 'S', color: 1, positions: vec![0,2]] --> false (sana ei kelpaa)
         */
-        let mut pos = 0;
-        for c in guess.chars() {
+        for (pos, c) in guess.chars().enumerate() {
             for blue in blues.iter() {
                 if blue.letter == c && blue.positions.as_ref().unwrap().contains(&pos) {
                     return false;
                 }
             }
-            pos += 1;
         }
         // at least n number of blues must be in the word though
         for blue in blues.iter() {
@@ -213,7 +210,7 @@ pub mod apuli {
         true
     }
 
-    fn check_oranges(oranges: &Vec<Letter>, guess: &String) -> bool {
+    fn check_oranges(oranges: &[Letter], guess: &str) -> bool {
         /*
         * Checks if the guess contains the correct oranges (in the right positions)
         let oranges = vec![
@@ -247,14 +244,14 @@ pub mod apuli {
         let mut words = Vec::new();
         match word_len {
             5 => {
-                for word in WORDS_5.split("\n") {
+                for word in WORDS_5.split('\n') {
                     if !word.is_empty() {
                         words.push(word.to_owned())
                     }
                 }
             }
             6 => {
-                for word in WORDS_6.split("\n") {
+                for word in WORDS_6.split('\n') {
                     if !word.is_empty() {
                         words.push(word.to_owned())
                     }
@@ -268,14 +265,14 @@ pub mod apuli {
     }
 
     pub fn query(
-        grays: &Vec<Letter>,
+        grays: &[Letter],
         blues: Option<Vec<Letter>>,
         oranges: Option<Vec<Letter>>,
         word_lenght: usize,
     ) -> Vec<String> {
         let mut words = all_words(word_lenght);
 
-        words.remove_grey(grays, blues.as_ref(), oranges.as_ref());
+        words.remove_grey(grays, blues.as_deref(), oranges.as_deref());
         words.remove_others(oranges.as_ref(), blues.as_ref());
 
         words
@@ -294,9 +291,9 @@ pub mod apuli {
                 let key = &letter;
                 if letter_frequency.contains_key(key) {
                     let mut positions: Vec<u16> = letter_frequency.get(key).unwrap().clone();
-                    positions[position] = positions[position] + 1u16;
+                    positions[position] += 1;
 
-                    letter_frequency.insert(key.clone(), positions.to_vec());
+                    letter_frequency.insert(*key, positions.to_vec());
                 } else {
                     let mut positions = vec![0; word_len];
                     positions[position] = 1;
@@ -309,7 +306,7 @@ pub mod apuli {
             let mut score = 0;
             for (ch, val) in &letter_frequency {
                 // doesn't reward words having duplicate letters as much
-                match word.appearances(&ch) {
+                match word.appearances(ch) {
                     0 => {}
                     n => {
                         // this increases score for potential orange letters
@@ -339,7 +336,7 @@ pub mod apuli {
     pub fn rank_combined(
         all_grays: &Vec<Vec<Letter>>,
         all_blues: Vec<Option<Vec<Letter>>>,
-        all_oranges: &Vec<Option<Vec<Letter>>>,
+        all_oranges: &[Option<Vec<Letter>>],
         words: Vec<String>,
     ) -> Vec<(i32, String)> {
         let mut letter_frequency: HashMap<char, Vec<i32>> = HashMap::new();
@@ -353,9 +350,9 @@ pub mod apuli {
                 let key = &letter;
                 if letter_frequency.contains_key(key) {
                     let mut positions: Vec<i32> = letter_frequency.get(key).unwrap().clone();
-                    positions[position] = positions[position] + 1;
+                    positions[position] += 1;
 
-                    letter_frequency.insert(key.clone(), positions.to_vec());
+                    letter_frequency.insert(*key, positions.to_vec());
                 } else {
                     let mut positions = vec![0; word_len];
                     positions[position] = 1;
@@ -368,7 +365,7 @@ pub mod apuli {
             let mut score = 0;
             for (ch, val) in &letter_frequency {
                 // doesn't reward words having duplicate letters as much
-                match word.appearances(&ch) {
+                match word.appearances(ch) {
                     0 => {}
                     n => {
                         // this increases score for potential orange letters
@@ -417,15 +414,13 @@ pub mod apuli {
         // handle blues
         for (score, word) in &mut result {
             // goes through all the boards
-            for blues in &all_blues {
+            for blues in all_blues.iter().flatten() {
                 // goes through all the blues in the board
-                if let Some(blues) = blues {
-                    for blue in blues {
-                        for (i, ltr) in word.chars().enumerate() {
-                            if ltr == blue.letter && blue.positions.as_ref().unwrap().contains(&i) {
-                                *score -= 1; // maybe change how much it should be reduced or even
-                                             // divided
-                            }
+                for blue in blues {
+                    for (i, ltr) in word.chars().enumerate() {
+                        if ltr == blue.letter && blue.positions.as_ref().unwrap().contains(&i) {
+                            *score -= 1; // maybe change how much it should be reduced or even
+                                         // divided
                         }
                     }
                 }
@@ -434,15 +429,11 @@ pub mod apuli {
 
         // then oranges
         for (score, word) in &mut result {
-            for oranges in all_oranges {
-                if let Some(oranges) = oranges {
-                    for orange in oranges {
-                        for (i, ltr) in word.chars().enumerate() {
-                            if ltr == orange.letter
-                                && orange.positions.as_ref().unwrap().contains(&i)
-                            {
-                                *score -= 1;
-                            }
+            for oranges in all_oranges.iter().flatten() {
+                for orange in oranges {
+                    for (i, ltr) in word.chars().enumerate() {
+                        if ltr == orange.letter && orange.positions.as_ref().unwrap().contains(&i) {
+                            *score -= 1;
                         }
                     }
                 }
@@ -489,7 +480,7 @@ pub mod apuli {
         for word in all_words {
             let mut score = 0;
             for (freq, ltr) in &letters {
-                match word.appearances(&ltr) {
+                match word.appearances(ltr) {
                     0 => {}
                     _ => score += freq,
                 }
