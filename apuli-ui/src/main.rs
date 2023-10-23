@@ -40,7 +40,7 @@ struct App {
     is_help_visible: bool,
     is_answer_visible: bool,
     is_menu_visible: bool,
-    is_combined: bool
+    is_combined: bool,
 }
 
 impl Component for App {
@@ -104,7 +104,7 @@ impl Component for App {
             }
             Msg::Enter => {
                 if self.input_handler.current.len() == self.currect_game.word_length
-                    && self.currect_game.current_guess < self.currect_game.max_guesses()-1
+                    && self.currect_game.current_guess < self.currect_game.max_guesses() - 1
                 {
                     self.currect_game.current_guess += 1;
                     self.input_handler.current = self
@@ -131,19 +131,31 @@ impl Component for App {
                 }
                 self.input_handler.word_len = word_length; //we don't want it to remember old stuff
                 self.input_handler.reset(); // so it automatically clears all the state
-                self.currect_game.tile_manager.iter_mut().for_each(|mngr| mngr.reset());
-                self.currect_game = Game::new(word_length, self.currect_game.theme, self.currect_game.mode);
+                self.currect_game
+                    .tile_manager
+                    .iter_mut()
+                    .for_each(|mngr| mngr.reset());
+                self.currect_game =
+                    Game::new(word_length, self.currect_game.theme, self.currect_game.mode);
                 self.is_menu_visible = false;
             }
-            Msg::UpdateTile(tile, board_index) => self.currect_game.tile_manager[board_index].update_tile(tile),
+            Msg::UpdateTile(tile, board_index) => {
+                self.currect_game.tile_manager[board_index].update_tile(tile)
+            }
             Msg::Clear => {
-                self.currect_game =
-                    Game::new(self.currect_game.word_length, self.currect_game.theme, self.currect_game.mode); // I guess replacing the game state with the
-                                                                                       // default game state works?
+                self.currect_game = Game::new(
+                    self.currect_game.word_length,
+                    self.currect_game.theme,
+                    self.currect_game.mode,
+                ); // I guess replacing the game state with the
+                   // default game state works?
                 self.input_handler.reset(); // gotta remember to clear the input loop
-                
+
                 // also gotta remember to clear tilestates
-                self.currect_game.tile_manager.iter_mut().for_each(|manager| manager.reset());
+                self.currect_game
+                    .tile_manager
+                    .iter_mut()
+                    .for_each(|manager| manager.reset());
             }
             Msg::ToggleHelp => {
                 self.is_help_visible = !self.is_help_visible;
@@ -168,12 +180,12 @@ impl Component for App {
             }
             Msg::ChangeMode(mode) => {
                 if mode != self.currect_game.mode {
-                    self.currect_game = Game::new(
-                        self.currect_game.word_length,
-                        self.currect_game.theme,
-                        mode,
-                    );
-                    self.currect_game.tile_manager.iter_mut().for_each(|manager: &mut TileManager| manager.reset());
+                    self.currect_game =
+                        Game::new(self.currect_game.word_length, self.currect_game.theme, mode);
+                    self.currect_game
+                        .tile_manager
+                        .iter_mut()
+                        .for_each(|manager: &mut TileManager| manager.reset());
                     self.input_handler.reset();
                 }
                 self.is_menu_visible = false;
@@ -197,7 +209,7 @@ impl Component for App {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let link = ctx.link();
-        let keyboard_state: Vec<char> = ALLOWED_KEYS.iter().map(|c| *c).collect();
+        let keyboard_state: Vec<char> = ALLOWED_KEYS.iter().copied();
 
         let game = &self.currect_game;
         let cb = link.callback(move |msg| msg);
@@ -247,7 +259,7 @@ impl Component for App {
                             }
                         }
                 }
-               
+
                 {
                     if self.is_help_visible {
                         html! { <HelpModal callback={cb.clone()} /> }
