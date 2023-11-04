@@ -19,19 +19,39 @@ mod apuli_bench {
     //   by rank()
     // 4: repeat 2-3 until 6 guesses is reached or only one word remains
     fn guesses_to_win() {
-        fn get_next_guess(prev: &[&str]) -> String {
-            let next_guess: String = Default::default();
-            if prev.is_empty() {
-                rank(all_words(5));
-            }
-            next_guess
+        fn gen_grays(word: &String, target: &String) -> Vec<Letter> {
+            let grays: Vec<Letter> = vec![];
+
+            grays
+        }
+        fn gen_blues(word: &String, target: &String) -> Vec<Letter> {
+            let blues: Vec<Letter> = vec![];
+
+            blues
+        }
+        fn gen_oranges(word: &String, target: &String) -> Vec<Letter> {
+            let oranges: Vec<Letter> = vec![];
+
+            oranges
         }
 
         let words_5 = all_words(5);
         for word in &words_5 {
             let guesses: &[&str] = &[];
             let mut words = words_5.clone();
-            get_next_guess(&guesses);
+            let mut next_guess: String = Default::default();
+            if guesses.is_empty() {
+                next_guess = match rank(all_words(5)).first() {
+                    Some((_, g_word)) => g_word.to_owned(),
+                    None => panic!("No word remaining in possible words"),
+                };
+                let grays = gen_grays(&next_guess, word);
+                let blues = gen_blues(&next_guess, word);
+                let oranges = gen_oranges(&next_guess, word);
+            } else {
+                //
+                todo!()
+            }
         }
     }
 }
