@@ -64,11 +64,7 @@ pub mod apuli {
             blues: Option<&[Letter]>,
             oranges: Option<&[Letter]>,
         ) -> Self;
-        fn remove_others(
-            &mut self,
-            blues: Option<&Vec<Letter>>,
-            oranges: Option<&Vec<Letter>>,
-        ) -> Self;
+        fn remove_others(&mut self, blues: Option<&[Letter]>, oranges: Option<&[Letter]>) -> Self;
         fn appearances(&self, guess: &str) -> usize;
     }
 
@@ -156,11 +152,7 @@ pub mod apuli {
             }
             self.to_vec()
         }
-        fn remove_others(
-            &mut self,
-            oranges: Option<&Vec<Letter>>,
-            blues: Option<&Vec<Letter>>,
-        ) -> Self {
+        fn remove_others(&mut self, oranges: Option<&[Letter]>, blues: Option<&[Letter]>) -> Self {
             if let Some(oranges) = oranges {
                 for word in self.clone().iter() {
                     if !check_oranges(oranges, word) {
@@ -273,7 +265,7 @@ pub mod apuli {
         let mut words = all_words(word_lenght);
 
         words.remove_grey(grays, blues.as_deref(), oranges.as_deref());
-        words.remove_others(oranges.as_ref(), blues.as_ref());
+        words.remove_others(oranges.as_deref(), blues.as_deref());
 
         words
     }
