@@ -5,9 +5,11 @@
 //
 // And obviously that the program doesn't give wrong answers
 
+#[cfg(test)]
 mod apuli_bench {
 
     use crate::apuli::*;
+    use std::collections::HashMap;
 
     // 1: Get the target word
     // 2: Generate the next guess (first is rank() with no args (it doesn't make sense to scout without
@@ -18,21 +20,89 @@ mod apuli_bench {
     // 3.9: If 5 bencing scouting and reach 5 guesses without an answer, take the best word given
     //   by rank()
     // 4: repeat 2-3 until 6 guesses is reached or only one word remains
+    #[test]
     fn guesses_to_win() {
-        fn gen_grays(word: &String, target: &String) -> Vec<Letter> {
-            let grays: Vec<Letter> = vec![];
-
+        fn gen_grays(words: &[String], target: &str) -> Vec<Letter> {
+            let mut grays: Vec<Letter> = vec![];
+            let mut cache: HashMap<char, Vec<usize>> = HashMap::new();
+            for word in words {
+                for (i, letter) in word.chars().enumerate() {
+                    if !target.contains(letter) {
+                        let positions = cache.get_mut(&letter).cloned();
+                        if let Some(mut positions) = positions {
+                            positions.push(i);
+                            cache.insert(letter, positions.to_vec());
+                        } else {
+                            cache.insert(letter, vec![i]);
+                        }
+                    }
+                }
+            }
+            for (k, v) in cache {
+                grays.push(Letter {
+                    letter: k,
+                    positions: Some(v),
+                })
+            }
             grays
         }
-        fn gen_blues(word: &String, target: &String) -> Option<Vec<Letter>> {
-            let blues: Vec<Letter> = vec![];
+        fn gen_blues(words: &[String], target: &String) -> Option<Vec<Letter>> {
+            let mut blues: Vec<Letter> = vec![];
+            let mut cache: HashMap<char, Vec<usize>> = HashMap::new();
+            for word in words {
+                for (i, letter) in word.chars().enumerate() {
+                    if letter != target.chars().nth(i).unwrap() && target.contains(letter) {
+                        let positions = cache.get_mut(&letter).cloned();
+                        if let Some(mut positions) = positions {
+                            positions.push(i);
+                            cache.insert(letter, positions.to_vec());
+                        } else {
+                            cache.insert(letter, vec![i]);
+                        }
+                    }
+                }
+            }
+            for (k, v) in cache {
+                blues.push(Letter {
+                    letter: k,
+                    positions: Some(v),
+                })
+            }
 
-            Some(blues)
+            if !blues.is_empty() {
+                Some(blues)
+            } else {
+                None
+            }
         }
-        fn gen_oranges(word: &String, target: &String) -> Option<Vec<Letter>> {
-            let oranges: Vec<Letter> = vec![];
+        fn gen_oranges(words: &[String], target: &str) -> Option<Vec<Letter>> {
+            let mut oranges: Vec<Letter> = vec![];
+            let mut cache: HashMap<char, Vec<usize>> = HashMap::new();
+            for word in words {
+                for (i, letter) in word.chars().enumerate() {
+                    if letter == target.chars().nth(i).unwrap() {
+                        let positions = cache.get_mut(&letter).cloned();
+                        if let Some(mut positions) = positions {
+                            positions.push(i);
+                            cache.insert(letter, positions.to_vec());
+                        } else {
+                            cache.insert(letter, vec![i]);
+                        }
+                    }
+                }
+            }
+            for (k, v) in cache {
+                oranges.push(Letter {
+                    letter: k,
+                    positions: Some(v),
+                })
+            }
 
-            Some(oranges)
+            if !oranges.is_empty() {
+                Some(oranges)
+            } else {
+                None
+            }
         }
 
         let words_5 = all_words(5);
@@ -47,9 +117,9 @@ mod apuli_bench {
                         None => panic!("No word remaining in possible words"),
                     };
                     guesses.push(next_guess.clone());
-                    let grays = gen_grays(&next_guess, word);
-                    let blues = gen_blues(&next_guess, word);
-                    let oranges = gen_oranges(&next_guess, word);
+                    let grays = gen_grays(&guesses, word);
+                    let blues = gen_blues(&guesses, word);
+                    let oranges = gen_oranges(&guesses, word);
                     words = query(&grays, blues, oranges, 5)
                 } else {
                     rank(words);
