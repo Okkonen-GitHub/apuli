@@ -52,6 +52,7 @@ mod apuli_bench {
             for word in words {
                 for (i, letter) in word.chars().enumerate() {
                     if letter != target.chars().nth(i).unwrap() && target.contains(letter) {
+                        dbg!(words, letter, target);
                         let positions = cache.get_mut(&letter).cloned();
                         if let Some(mut positions) = positions {
                             positions.push(i);
@@ -104,28 +105,42 @@ mod apuli_bench {
                 None
             }
         }
+        let mut data = HashMap::new();
 
         let words_5 = all_words(5);
         for word in &words_5 {
             let mut guesses: Vec<String> = vec![];
             let mut words = words_5.clone();
-            let mut next_guess: String = Default::default();
-            while guesses.len() < 6 {
+            let mut next_guess: String;
+            while guesses.len() < 6 && words.len() > 1 {
                 if guesses.is_empty() {
                     next_guess = match rank(all_words(5)).first() {
                         Some((_, g_word)) => g_word.to_owned(),
                         None => panic!("No word remaining in possible words"),
                     };
-                    guesses.push(next_guess.clone());
-                    let grays = gen_grays(&guesses, word);
-                    let blues = gen_blues(&guesses, word);
-                    let oranges = gen_oranges(&guesses, word);
-                    words = query(&grays, blues, oranges, 5)
                 } else {
-                    rank(words);
-                    todo!()
+                    next_guess = match rank(words).first() {
+                        Some((_, g_word)) => g_word.to_owned(),
+                        None => panic!("No words remaining in possible words"),
+                    };
                 }
+                guesses.push(next_guess);
+                let grays = gen_grays(&guesses, word);
+                let blues = gen_blues(&guesses, word);
+                let oranges = gen_oranges(&guesses, word);
+                words = query(&grays, blues, oranges, 5);
             }
+            {
+                let result = rank(words.clone());
+                data.insert("remaining", format!("{}", result.len()));
+                data.insert("Best guess", format!("{:?}", result.first()));
+                data.insert("TARGET", word.to_owned());
+                data.insert("GUESS COUNT", guesses.len().to_string());
+                data.insert("Guesses", format!("{:?}", guesses));
+                assert_eq!(*word, result.first().unwrap().1);
+                dbg!(&data);
+            }
+            break;
         }
     }
 }
