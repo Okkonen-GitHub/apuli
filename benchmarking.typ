@@ -12,18 +12,42 @@ And obviously that the program doesn't give wrong answers
   columns: (auto, auto, auto),
   inset: 10pt,
   align: horizon,
-  [Version, revision], [Number of solved games], [Average guess count],
+  [Version, revision], [Number of non-solved games], [Average guess count],
   "0.1.0, 1",
   [
-    $5: 1366 slash 3085$ \
-    $6: 0 slash 4221$
+    $5: ~224 slash 3085$ \
+    $6: "N/A" slash 4221$
   ],
-  " 4.091734197730956",
+  [
+  4.091734197730956\
+  N/A
+  ],
   "0.1.0, 2",
   [
-    $5: 0 slash 3085$ \
-    $6: 0 slash 4221$
+    $5: ~224 slash 3085$ \
+    $6: ~71 slash 4221$
   ],
-  "12 (to do)",
+  [
+    4.091734197730956\
+    3.596304193319119
+  ],
+  "0.1.0, 3",
+  [
+    $5: 28 slash 3085$ \
+    $6: 20 slash 4221$
+  ],
+  [
+    3.8764991896272285\
+    3.5925136223643688
+  ],
+  "0.1.0, 4",
+  [
+    $5: 34 slash 3085$ \
+    $6: 4 slash 4221$
+  ],
+  [
+    3.9273905996758507\
+    3.487562189054726
+  ],
   )
 

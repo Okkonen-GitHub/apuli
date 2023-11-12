@@ -9,7 +9,11 @@
 mod apuli_bench {
 
     use crate::apuli::*;
-    use std::collections::HashMap;
+    use std::{collections::HashMap, usize};
+
+    // scouted first guesses
+    const FIRST_5_GUESS: &str = "KITUA";
+    const FIRST_6_GUESS: &str = "KARSTI";
 
     // 1: Get the target word
     // 2: Generate the next guess (first is rank() with no args (it doesn't make sense to scout without
@@ -105,47 +109,70 @@ mod apuli_bench {
                 None
             }
         }
-        let mut data = HashMap::new();
-        let mut scores: Vec<usize> = vec![];
+        for l in 5..=6 {
+            let mut data = HashMap::new();
+            let mut scores: Vec<usize> = vec![];
 
-        let words_5 = all_words(5);
-        for word in &words_5 {
-            let mut guesses: Vec<String> = vec![];
-            let mut words = words_5.clone();
-            let mut next_guess: String;
-            while guesses.len() < 6 && words.len() > 1 {
-                if guesses.is_empty() {
-                    next_guess = match rank(all_words(5)).first() {
-                        Some((_, g_word)) => g_word.to_owned(),
-                        None => panic!("No word remaining in possible words"),
-                    };
-                } else {
-                    next_guess = match rank(words).first() {
-                        Some((_, g_word)) => g_word.to_owned(),
-                        None => panic!("No words remaining in possible words"),
-                    };
+            let all_n_words = all_words(l);
+            for word in &all_n_words {
+                let mut guesses: Vec<String> = vec![];
+                let mut words = all_n_words.clone();
+                let mut next_guess: String;
+                while guesses.len() < 6 && words.len() > 1 {
+                    if guesses.is_empty() {
+                        // scout first?
+                        // next_guess = match rank_scout(all_words(l), l).first() {
+                        //     Some((_, g_word)) => g_word.to_owned(),
+                        //     None => panic!("No word remaining in possible words"),
+                        // };
+                        next_guess = match l {
+                            5 => FIRST_5_GUESS.to_owned(),
+                            6 => FIRST_6_GUESS.to_owned(),
+                            _ => unreachable!(),
+                        }
+                    } else if guesses.len() < 5 {
+                        // scout
+                        let ranked: Vec<String> =
+                            rank(words).iter().map(|(_, x)| x.to_owned()).collect();
+                        next_guess = match rank_scout(ranked.clone(), l).first() {
+                            Some((_, g_word)) => g_word.to_owned(),
+                            None => ranked.first().unwrap().to_owned(),
+                        }
+                    } else {
+                        next_guess = match rank(words).first() {
+                            Some((_, g_word)) => g_word.to_owned(),
+                            None => panic!("No words remaining in possible words"),
+                        };
+                    }
+                    guesses.push(next_guess);
+                    let grays = gen_grays(&guesses, word);
+                    let blues = gen_blues(&guesses, word);
+                    let oranges = gen_oranges(&guesses, word);
+                    words = query(&grays, blues, oranges, l);
                 }
-                guesses.push(next_guess);
-                let grays = gen_grays(&guesses, word);
-                let blues = gen_blues(&guesses, word);
-                let oranges = gen_oranges(&guesses, word);
-                words = query(&grays, blues, oranges, 5);
+                {
+                    let result = rank(words.clone());
+                    data.insert("remaining", format!("{}", result.len()));
+                    data.insert("Best guess", format!("{:?}", result.first()));
+                    data.insert("TARGET", word.to_owned());
+                    data.insert("GUESS COUNT", guesses.len().to_string());
+                    data.insert("Guesses", format!("{:?}", guesses));
+                    // assert_eq!(*word, result.first().unwrap().1);
+                    scores.push(guesses.len() + 1);
+                    // if guesses.len() >= 5 {
+                    //     dbg!(guesses, word, result);
+                    // }
+                    // dbg!(&data);
+                }
+                // break;
             }
-            {
-                let result = rank(words.clone());
-                data.insert("remaining", format!("{}", result.len()));
-                data.insert("Best guess", format!("{:?}", result.first()));
-                data.insert("TARGET", word.to_owned());
-                data.insert("GUESS COUNT", guesses.len().to_string());
-                data.insert("Guesses", format!("{:?}", guesses));
-                // assert_eq!(*word, result.first().unwrap().1);
-                scores.push(guesses.len() + 1);
-                // dbg!(&data);
-            }
-            // break;
+            let avg: f64 = scores.iter().sum::<usize>() as f64 / scores.len() as f64;
+            let not_solved: usize = scores
+                .iter()
+                .filter(|&x| *x >= 6)
+                .collect::<Vec<&usize>>()
+                .len();
+            dbg!(avg, not_solved, scores.len());
         }
-        let avg: f64 = scores.iter().sum::<usize>() as f64 / scores.len() as f64;
-        let n_solved: usize = scores.iter().filter(|x| *x >= &6).sum();
-        dbg!(avg, n_solved, scores.len());
     }
 }
