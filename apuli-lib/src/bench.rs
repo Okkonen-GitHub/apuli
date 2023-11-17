@@ -9,7 +9,7 @@
 mod apuli_bench {
 
     use crate::apuli::*;
-    use std::{collections::HashMap, usize};
+    use std::{borrow::BorrowMut, collections::HashMap, hash::Hash, ops::IndexMut, usize};
 
     // Predetermined first guesses
     const FIRST_5_GUESS: &str = "KASTI";
@@ -109,6 +109,62 @@ mod apuli_bench {
                 None
             }
         }
+        fn gen_all(
+            words: &[String],
+            mut target: String,
+        ) -> (Vec<Letter>, Vec<Letter>, Vec<Letter>) {
+            let mut oranges: Vec<Letter> = vec![];
+            let mut blues: Vec<Letter> = vec![];
+            let mut grays: Vec<Letter> = vec![];
+            let mut orange_cache: HashMap<char, Vec<usize>> = HashMap::new();
+            let mut blue_cache: HashMap<char, Vec<usize>> = HashMap::new();
+            let mut gray_cache: HashMap<char, Vec<usize>> = HashMap::new();
+            fn cache_insert<K, V>(cache: &mut HashMap<K, Vec<V>>, k: K, v: V)
+            where
+                K: Eq,
+                K: Hash,
+                V: Clone,
+            {
+                let positions = cache.get_mut(&k).cloned();
+                if let Some(mut positions) = positions {
+                    positions.push(v);
+                    cache.insert(k, positions.to_vec());
+                } else {
+                    cache.insert(k, vec![v]);
+                }
+            }
+            for word in words {
+                for (i, letter) in word.chars().enumerate() {
+                    if letter == target.chars().nth(i).unwrap() {
+                        cache_insert(&mut orange_cache, letter, i);
+                    } else if word.contains(letter) {
+                        cache_insert(&mut blue_cache, letter, i);
+                        target.replace_range(i..i, " ");
+                    } else {
+                        cache_insert(&mut gray_cache, letter, i);
+                    }
+                }
+            }
+            for (k, v) in orange_cache {
+                oranges.push(Letter {
+                    letter: k,
+                    positions: Some(v),
+                })
+            }
+            for (k, v) in blue_cache {
+                blues.push(Letter {
+                    letter: k,
+                    positions: Some(v),
+                })
+            }
+            for (k, v) in gray_cache {
+                grays.push(Letter {
+                    letter: k,
+                    positions: Some(v),
+                })
+            }
+            (grays, blues, oranges)
+        }
         for l in 5..=6 {
             let mut data = HashMap::new();
             let mut scores: Vec<usize> = vec![];
@@ -145,10 +201,11 @@ mod apuli_bench {
                         };
                     }
                     guesses.push(next_guess);
-                    let grays = gen_grays(&guesses, word);
-                    let blues = gen_blues(&guesses, word);
-                    let oranges = gen_oranges(&guesses, word);
-                    words = query(&grays, blues, oranges, l);
+                    // let grays = gen_grays(&guesses, word);
+                    // let blues = gen_blues(&guesses, word);
+                    // let oranges = gen_oranges(&guesses, word);
+                    let (oranges, blues, grays) = gen_all(&guesses, word.clone());
+                    words = query(&grays, Some(blues), Some(oranges), l);
                 }
                 {
                     let result = rank(words.clone());
