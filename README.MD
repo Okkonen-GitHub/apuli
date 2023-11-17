@@ -11,7 +11,10 @@ Katso [NOTICE.MD](NOTICE.MD)
 
 - [x] Support for neluli
 - [x] Ranking system for guesses based roughly on information revealed by guess
-- [ ] Refactoring code
+- [x] "Scouting" feature
+- [ ] Fix blue and orange generation in bench, ui, and possibly checking them in lib
+- [ ] Make the algorithm smarter by including stuff from information theory (rank, scout)
+- [ ] Refactoring code (in progess)
 
 ## Apuli-ui
 

@@ -11,8 +11,8 @@ mod apuli_bench {
     use crate::apuli::*;
     use std::{collections::HashMap, usize};
 
-    // scouted first guesses
-    const FIRST_5_GUESS: &str = "KITUA";
+    // Predetermined first guesses
+    const FIRST_5_GUESS: &str = "KASTI";
     const FIRST_6_GUESS: &str = "KARSTI";
 
     // 1: Get the target word
@@ -50,7 +50,7 @@ mod apuli_bench {
             }
             grays
         }
-        fn gen_blues(words: &[String], target: &String) -> Option<Vec<Letter>> {
+        fn gen_blues(words: &[String], target: &str) -> Option<Vec<Letter>> {
             let mut blues: Vec<Letter> = vec![];
             let mut cache: HashMap<char, Vec<usize>> = HashMap::new();
             for word in words {
