@@ -17,7 +17,7 @@ Katso [NOTICE.MD](NOTICE.MD).
 - [x] Ranking system for guesses based roughly on information revealed by guess
 - [x] "Scouting" feature
 - [ ] Fix blue and orange generation in bench, ui, and possibly checking them in lib (in progess)
-- [ ] Apuili-dbg : a visual debugging app to ensure correctness of the algorithm
+- [ ] Apuli-dbg : a visual debugging app to ensure correctness of the algorithm
 - [ ] Reduce information in Apuli-ui and other optimizations
 - [ ] Make the algorithm smarter by including stuff from information theory (rank, scout)
 - [ ] Refactoring code (in progess)
