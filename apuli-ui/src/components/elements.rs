@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::Msg;
 use apuli_lib::apuli::rank_scout;
 use yew::prelude::*;
@@ -134,6 +136,24 @@ pub fn help_modal(props: &HelpModalProps) -> Html {
     }
 }
 
+// T would be u16 if I hadn't made different ranking methods use different types
+// This is because theoretically it is possible to have a word with negative score in some cases
+fn show_n_answers<T>(words: Vec<(T, String)>, n: usize) -> Html
+where
+    T: Display,
+{
+    let words = words.iter().take(n).enumerate();
+    words
+        .map(|(index, (score, word))| {
+            html! {
+                <p class="answer">
+                    {index}{".  "}{word} <wbr/> {format!("  (VR:{score})") }
+                </p>
+            }
+        })
+        .collect::<Html>()
+}
+
 #[derive(Properties, PartialEq)]
 pub struct AnswerModalProps {
     pub callback: Callback<Msg>,
@@ -189,14 +209,7 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                                                         let grays = mngr.gen_grays();
                                                                         let result = query(&grays, blues, oranges, props.word_length);
                                                                         let ranked = rank(result);
-
-                                                                        ranked.iter().enumerate().map(|(index, (score, word))| {
-                                                                            html ! {
-                                                                                <p class="answer">
-                                                                                    {index}{".  "}{word} <wbr/> {format!("  (VR:{score})") }
-                                                                                </p>
-                                                                            }
-                                                                            }).collect::<Html>()
+                                                                        show_n_answers(ranked, 25)
                                                                     }}
                                                             }
                                                         }
@@ -228,20 +241,14 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                     let res = query(&grays[i], blues[i].clone(), oranges[i].clone(), props.word_length);
                                     if res.len() != 1 {
                                         res.iter().for_each(|word| {
-                                        words.push(word.clone());
+                                            words.push(word.clone());
                                         });
                                     }
 
                                 }
                                 // cprint(&words);
                                 let ranked = rank_combined(&grays, blues, &oranges, words);
-                                html! {
-                                    ranked.iter().enumerate().map(|(index, (score, word))| {
-                                        html ! {
-                                            <p>{index}{".  "}{word}{"  (VR: "} {score} {")"}</p>
-                                        }
-                                    }).collect::<Html>()
-                                }
+                                show_n_answers(ranked, 25)
 
                             }
                         }}
@@ -269,19 +276,11 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                 if !props.show_combined {
                                     let ranked = rank(result);
 
-                                    ranked.iter().enumerate().map(|(index, (score, word))| {
-                                    html ! {
-                                    <p>{index}{".  "}{word}{"  (VR: "} {score} {")"}</p>
-                                    }
-                                    }).collect::<Html>()
+                                    show_n_answers(ranked, 25)
 
                                 } else {
                                     let ranked = rank_scout(result, props.word_length);
-                                    ranked.iter().enumerate().map(|(index, (score, word))| {
-                                        html ! {
-                                        <p>{index}{".  "}{word}{"  (VR: "} {score} {")"}</p>
-                                            }
-                                    }).collect::<Html>()
+                                    show_n_answers(ranked, 25)
                                 }
                             }}
                         </>
