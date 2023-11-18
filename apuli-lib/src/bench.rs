@@ -8,8 +8,8 @@
 #[cfg(test)]
 mod apuli_bench {
 
-    use crate::{apuli::*, util::cache_insert};
-    use std::collections::HashMap;
+    use crate::apuli::*;
+    use std::{borrow::BorrowMut, collections::HashMap, hash::Hash, ops::IndexMut, usize};
 
     // Predetermined first guesses
     const FIRST_5_GUESS: &str = "KASTI";
@@ -119,13 +119,27 @@ mod apuli_bench {
             let mut orange_cache: HashMap<char, Vec<usize>> = HashMap::new();
             let mut blue_cache: HashMap<char, Vec<usize>> = HashMap::new();
             let mut gray_cache: HashMap<char, Vec<usize>> = HashMap::new();
+            fn cache_insert<K, V>(cache: &mut HashMap<K, Vec<V>>, k: K, v: V)
+            where
+                K: Eq,
+                K: Hash,
+                V: Clone,
+            {
+                let positions = cache.get_mut(&k).cloned();
+                if let Some(mut positions) = positions {
+                    positions.push(v);
+                    cache.insert(k, positions.to_vec());
+                } else {
+                    cache.insert(k, vec![v]);
+                }
+            }
             for word in words {
                 for (i, letter) in word.chars().enumerate() {
                     if letter == target.chars().nth(i).unwrap() {
                         cache_insert(&mut orange_cache, letter, i);
                     } else if word.contains(letter) {
                         cache_insert(&mut blue_cache, letter, i);
-                        target = target.replacen(letter, " ", 1);
+                        target.replace_range(i..i, " ");
                     } else {
                         cache_insert(&mut gray_cache, letter, i);
                     }
@@ -217,50 +231,5 @@ mod apuli_bench {
                 .len();
             dbg!(avg, not_solved, scores.len());
         }
-    }
-    #[test]
-    fn pattern_generation() {
-        use crate::information::information::{generate_patterns, State};
-        let remaining = vec![
-            "RYHMÄ", "MYÖHÄ", "NÖYRÄ", "HÖYNÄ", "RYÖNÄ", "MYÖDÄ", "MYYRÄ", "MÖNJÄ", "HYHMÄ",
-            "HYRRÄ", "MÄYRÄ", "MYYJÄ", "MYYDÄ", "JÄYHÄ", "RÄHMÄ", "HÄRMÄ", "JÄYNÄ", "JÄÄHY",
-            "RÄHJÄ", "HÄÄYÖ", "RYHMY", "MÖYHY", "ÄRJYÄ", "HÖYRY", "RÖYHY", "MÄÄRÄ", "NÄHDÄ",
-            "RUGBY", "MURJU", "JÄÄRÄ", "JÄÄMÄ", "CURRY", "JÄNNÄ", "HUURU", "JÄÄDÄ", "HÖRHÖ",
-            "JUNNU", "NYNNY", "MÖMMÖ", "MUMMU",
-        ];
-        let remaining = remaining
-            .iter()
-            .map(|x| x.to_string())
-            .collect::<Vec<String>>();
-        let result = generate_patterns("RYHMÄ".to_owned(), &remaining);
-        let key = [
-            State::Absent,
-            State::Present,
-            State::Present,
-            State::Absent,
-            State::Present,
-        ];
-        dbg!(result.get(&key));
-        // dbg!(result);
-        let remaining = vec![
-            "RYHMÄ", "MYÖHÄ", "NÖYRÄ", "HÖYNÄ", "RYÖNÄ", "MYÖDÄ", "MYYRÄ", "MÖNJÄ", "HYHMÄ",
-            "HYRRÄ", "MÄYRÄ", "MYYJÄ", "MYYDÄ", "JÄYHÄ", "RÄHMÄ", "HÄRMÄ", "JÄYNÄ", "JÄÄHY",
-            "RÄHJÄ", "HÄÄYÖ", "RYHMY", "MÖYHY", "ÄRJYÄ", "HÖYRY", "RÖYHY", "MÄÄRÄ", "NÄHDÄ",
-            "RUGBY", "MURJU", "JÄÄRÄ", "JÄÄMÄ", "CURRY", "JÄNNÄ", "HUURU", "JÄÄDÄ", "HÖRHÖ",
-            "JUNNU", "NYNNY", "MÖMMÖ", "MUMMU",
-        ];
-        let remaining = remaining
-            .iter()
-            .map(|x| x.to_string())
-            .collect::<Vec<String>>();
-        let result = generate_patterns("ÄÄMMÄ".to_owned(), &remaining);
-        let key = [
-            State::Correct,
-            State::Absent,
-            State::Absent,
-            State::Absent,
-            State::Correct,
-        ];
-        dbg!(result.get(&key));
     }
 }
