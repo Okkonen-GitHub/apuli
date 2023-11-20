@@ -233,10 +233,31 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                     }
                                 },
                                 AnswerType::Information => {
+                                    // refactor this maybe
                                     html! {
-                                        <p>
-                                            {"Todo"}
-                                        </p>
+                                        <div class="neluli-answer">
+                                            {
+                                                (0..4).into_iter().map(|i| {
+                                                    html! {
+                                                        <div class="answer-container">
+                                                            {
+                                                                html! {
+                                                                        {{
+                                                                            let mngr = &mut mngr[i].clone();
+                                                                            let oranges = mngr.gen_oranges();
+                                                                            let blues = mngr.gen_blues(/*oranges.as_ref()*/);
+                                                                            let grays = mngr.gen_grays();
+                                                                            let result = query(&grays, blues, oranges, props.word_length);
+                                                                            let ranked = rank_entropy(&result);
+                                                                            show_n_answers(ranked, 25)
+                                                                        }}
+                                                                }
+                                                            }
+                                                        </div>
+                                                    }
+                                                }).collect::<Html>()
+                                            }
+                                        </div>
                                     }
                                 },
                                 AnswerType::Scout => {
