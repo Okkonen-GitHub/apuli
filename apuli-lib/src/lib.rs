@@ -1,5 +1,5 @@
 mod bench;
-mod information;
+pub mod information;
 pub mod util;
 //
 // #[cfg(test)]
