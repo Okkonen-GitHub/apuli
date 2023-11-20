@@ -161,6 +161,7 @@ mod apuli_bench {
                 let mut words = all_n_words.clone();
                 let mut next_guess: String;
                 while guesses.len() < 6 && words.len() > 1 {
+                    dbg!(&guesses, &words);
                     if guesses.is_empty() {
                         // scout first?
                         // next_guess = match rank_scout(all_words(l), l).first() {
@@ -171,7 +172,7 @@ mod apuli_bench {
                             5 => FIRST_5_GUESS.to_owned(),
                             6 => FIRST_6_GUESS.to_owned(),
                             _ => unreachable!(),
-                        }
+                        };
                     } else if guesses.len() < 5 {
                         // scout
                         let ranked: Vec<String> =
@@ -179,7 +180,7 @@ mod apuli_bench {
                         next_guess = match rank_scout(ranked.clone(), l).first() {
                             Some((_, g_word)) => g_word.to_owned(),
                             None => ranked.first().unwrap().to_owned(),
-                        }
+                        };
                     } else {
                         next_guess = match rank(words).first() {
                             Some((_, g_word)) => g_word.to_owned(),
@@ -201,6 +202,10 @@ mod apuli_bench {
                     data.insert("GUESS COUNT", guesses.len().to_string());
                     data.insert("Guesses", format!("{:?}", guesses));
                     // assert_eq!(*word, result.first().unwrap().1);
+                    dbg!(word);
+                    if *word != result.first().unwrap().1 {
+                        dbg!(&data);
+                    }
                     scores.push(guesses.len() + 1);
                     // if guesses.len() >= 5 {
                     //     dbg!(guesses, word, result);
@@ -220,7 +225,7 @@ mod apuli_bench {
     }
     #[test]
     fn pattern_generation() {
-        use crate::information::information::{generate_patterns, State};
+        use crate::information::{generate_patterns, State};
         let remaining = vec![
             "RYHMÄ", "MYÖHÄ", "NÖYRÄ", "HÖYNÄ", "RYÖNÄ", "MYÖDÄ", "MYYRÄ", "MÖNJÄ", "HYHMÄ",
             "HYRRÄ", "MÄYRÄ", "MYYJÄ", "MYYDÄ", "JÄYHÄ", "RÄHMÄ", "HÄRMÄ", "JÄYNÄ", "JÄÄHY",
@@ -233,7 +238,7 @@ mod apuli_bench {
             .map(|x| x.to_string())
             .collect::<Vec<String>>();
         let result = generate_patterns("RYHMÄ".to_owned(), &remaining);
-        let key = [
+        let key = vec![
             State::Absent,
             State::Present,
             State::Present,
@@ -254,7 +259,7 @@ mod apuli_bench {
             .map(|x| x.to_string())
             .collect::<Vec<String>>();
         let result = generate_patterns("ÄÄMMÄ".to_owned(), &remaining);
-        let key = [
+        let key = vec![
             State::Correct,
             State::Absent,
             State::Absent,
