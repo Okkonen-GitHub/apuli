@@ -1,4 +1,5 @@
 use apuli_lib::apuli::Letter;
+use apuli_lib::util::cache_insert;
 use std::collections::HashMap;
 
 #[derive(PartialEq, Clone)]
@@ -49,14 +50,7 @@ impl TileManager {
         let mut cache: HashMap<char, Vec<usize>> = HashMap::new();
         for (_index, tile) in self.tiles.iter().enumerate() {
             if tile.state == TileState::Orange {
-                let positions = cache.get_mut(&tile.character).cloned();
-                if let Some(mut positions) = positions {
-                    positions.push(tile.position);
-                    cache.insert(tile.character, positions.to_vec());
-                } else {
-                    cache.insert(tile.character, vec![tile.position]);
-                }
-                // self.tiles.remove(index);
+                cache_insert(&mut cache, tile.character, tile.position);
             }
         }
         for (k, v) in cache {
@@ -72,7 +66,8 @@ impl TileManager {
         }
     }
     // oranges must be generated first
-    // generates a list of blues and converts "ominous" grays into blues
+    // generates a list of blues and converts "ominous" grays into blues (... this is all gonna
+    // change later)
     pub fn gen_blues(&mut self /*, oranges: Option<&Vec<Letter>>*/) -> Option<Vec<Letter>> {
         let mut blues = Vec::new();
         let mut cache: HashMap<char, Vec<usize>> = HashMap::new();
@@ -100,13 +95,7 @@ impl TileManager {
             //     }
             // }
             if tile.state == TileState::Blue {
-                let positions = cache.get_mut(&tile.character).cloned();
-                if let Some(mut positions) = positions {
-                    positions.push(tile.position);
-                    cache.insert(tile.character, positions.to_vec());
-                } else {
-                    cache.insert(tile.character, vec![tile.position]);
-                }
+                cache_insert(&mut cache, tile.character, tile.position);
             }
         }
         for (k, v) in cache {
@@ -128,16 +117,10 @@ impl TileManager {
 
         for (_index, tile) in self.tiles.iter().enumerate() {
             if tile.state == TileState::Gray {
-                let positions = cache.get_mut(&tile.character).cloned();
-                if let Some(mut positions) = positions {
-                    positions.push(tile.position);
-                    cache.insert(tile.character, positions.to_vec());
-                } else {
-                    cache.insert(tile.character, vec![tile.position]); //TODO I don't think
-                                                                       // positions are needed here so passing None would be fine, or actually using a
-                                                                       // vec could be enough
-                }
-                // self.tiles.remove(index);
+                cache_insert(&mut cache, tile.character, tile.position);
+                //TODO I don't think
+                // positions are needed here so passing None would be fine, or actually using a
+                // vec could be enough
             }
         }
         for (k, v) in cache {
