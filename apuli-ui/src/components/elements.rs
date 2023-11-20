@@ -142,13 +142,20 @@ where
         .collect::<Html>()
 }
 
+#[derive(PartialEq, Copy, Clone)]
+pub enum AnswerType {
+    Basic,
+    Information,
+    Scout,
+}
+
 #[derive(Properties, PartialEq)]
 pub struct AnswerModalProps {
     pub callback: Callback<Msg>,
     pub tile_manager: Vec<TileManager>,
     pub word_length: usize,
     pub game_mode: GameMode,
-    pub show_combined: bool,
+    pub answer_mode: AnswerType,
 }
 
 #[function_component(AnswerModal)]
@@ -156,7 +163,9 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
     let callback = props.callback.clone();
     let toggle_answer = onmousedown!(callback, Msg::ToggleAnswer);
 
-    let toggle_combined = onmousedown!(callback, Msg::ToggleCombined);
+    let set_basic = onmousedown!(callback, Msg::ChangeAnswerMode(AnswerType::Basic));
+    let set_information = onmousedown!(callback, Msg::ChangeAnswerMode(AnswerType::Information));
+    let set_scout = onmousedown!(callback, Msg::ChangeAnswerMode(AnswerType::Scout));
 
     let mngr = props.tile_manager.clone();
 
@@ -166,78 +175,96 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
             <span onmousedown={toggle_answer} class="modal-close answer-modal">
                 {"✖"}
             </span>
+                <div>
+                    <label class="label">{"Valitse algoritmi"}</label>
+                    <div class="select-container">
+                        <button class={classes!("select", (props.answer_mode == AnswerType::Basic).then_some("select-active"))}
+                            onmousedown={set_basic}>
+                            { "Perus" }
+                        </button>
+                        <button class={classes!("select", (props.answer_mode == AnswerType::Information).then_some("select-active"))}
+                            onmousedown={set_information}>
+                            { "Informaatio" }
+                        </button>
+                        <button class={classes!("select", (props.answer_mode == AnswerType::Scout).then_some("select-active"))}
+                            onmousedown={set_scout}>
+                            { "Yhdistetty" }
+                        </button>
+
+                    </div>
+                </div>
             {
                 if props.game_mode == GameMode::Neluli {
                     html! {
                         <>
-                            <div>
-                                <label class="label">{"Yhdistetty?"}</label>
-                                <div class="select-container">
-                                    <button class={classes!("select", (props.show_combined).then_some("select-active"))}
-                                        onmousedown={toggle_combined}>
-                                        { if props.show_combined {"Yhdistetty"} else {"Erikseen"} }
-                                    </button>
-                                </div>
-                            </div>
+
 
                         {{
-                            if !props.show_combined {
-                                html! {
-                                    <div class="neluli-answer">
-                                        {
-                                            (0..4).into_iter().map(|i| {
-                                                html! {
-                                                    <div class="answer-container">
-                                                        {
-                                                            html ! {
-                                                                    {{
-                                                                        let mngr = &mut mngr[i].clone();
-                                                                        let oranges = mngr.gen_oranges();
-                                                                        let blues = mngr.gen_blues(/*oranges.as_ref()*/);
-                                                                        let grays = mngr.gen_grays();
-                                                                        let result = query(&grays, blues, oranges, props.word_length);
-                                                                        let ranked = rank(result);
-                                                                        show_n_answers(ranked, 25)
-                                                                    }}
+                            match props.answer_mode {
+                                AnswerType::Basic => {
+                                    html! {
+                                        <div class="neluli-answer">
+                                            {
+                                                (0..4).into_iter().map(|i| {
+                                                    html! {
+                                                        <div class="answer-container">
+                                                            {
+                                                                html ! {
+                                                                        {{
+                                                                            let mngr = &mut mngr[i].clone();
+                                                                            let oranges = mngr.gen_oranges();
+                                                                            let blues = mngr.gen_blues(/*oranges.as_ref()*/);
+                                                                            let grays = mngr.gen_grays();
+                                                                            let result = query(&grays, blues, oranges, props.word_length);
+                                                                            let ranked = rank(result);
+                                                                            show_n_answers(ranked, 25)
+                                                                        }}
+                                                                }
                                                             }
-                                                        }
-                                                    </div>
-                                                }
-                                            }).collect::<Html>()
+                                                        </div>
+                                                    }
+                                                }).collect::<Html>()
+                                            }
+                                        </div>
+                                    }
+                                },
+                                AnswerType::Information => {
+                                    html! {
+                                        <p>
+                                            {"Todo"}
+                                        </p>
+                                    }
+                                },
+                                AnswerType::Scout => {
+                                    let mngr = &mut mngr.clone();
+
+                                    let mut oranges: Vec<Option<Vec<Letter>>> = Vec::new();
+                                    let mut blues: Vec<Option<Vec<Letter>>> = Vec::new();
+                                    let mut grays: Vec<Vec<Letter>> = Vec::new();
+                                    for board_mngr in mngr.iter().take(4) {
+                                        let mut manager = board_mngr.clone();
+                                        oranges.push(manager.gen_oranges());
+                                        blues.push(manager.gen_blues());
+                                        grays.push(manager.gen_grays());
+                                    }
+                                    let mut words = Vec::new();
+                                    // let blues_n = blues.clone();
+                                    for i in 0..4 {
+                                        // Should check for duplicates BUT increase score for the
+                                        // duplicates
+                                        // cprint(&grays[i]); cprint(&i);
+                                        let res = query(&grays[i], blues[i].clone(), oranges[i].clone(), props.word_length);
+                                        if res.len() != 1 {
+                                            res.iter().for_each(|word| {
+                                                words.push(word.clone());
+                                            });
                                         }
-                                    </div>
+
                                     }
-                            } else {
-
-                                let mngr = &mut mngr.clone();
-
-                                let mut oranges: Vec<Option<Vec<Letter>>> = Vec::new();
-                                let mut blues: Vec<Option<Vec<Letter>>> = Vec::new();
-                                let mut grays: Vec<Vec<Letter>> = Vec::new();
-                                for board_mngr in mngr.iter().take(4) {
-                                    let mut manager = board_mngr.clone();
-                                    oranges.push(manager.gen_oranges());
-                                    blues.push(manager.gen_blues());
-                                    grays.push(manager.gen_grays());
+                                    // cprint(&words);
+                                    let ranked = rank_combined(&grays, blues, &oranges, words);
+                                    show_n_answers(ranked, 25)
                                 }
-                                let mut words = Vec::new();
-                                // let blues_n = blues.clone();
-                                for i in 0..4 {
-                                    // Should check for duplicates BUT increase score for the
-                                    // duplicates
-                                    // cprint(&grays[i]); cprint(&i);
-                                    let res = query(&grays[i], blues[i].clone(), oranges[i].clone(), props.word_length);
-                                    if res.len() != 1 {
-                                        res.iter().for_each(|word| {
-                                            words.push(word.clone());
-                                        });
-                                    }
-
-                                }
-                                // cprint(&words);
-                                let ranked = rank_combined(&grays, blues, &oranges, words);
-                                show_n_answers(ranked, 25)
-
                             }
                         }}
                     </>
@@ -245,15 +272,7 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                 } else { // props.game_mode == GameMode::Sanuli
                     html! {
                         <>
-                            <div>
-                                <label class="label">{"Tiedustelu tila"}</label>
-                                <div class="select-container">
-                                    <button class={classes!("select", (props.show_combined).then_some("select-active"))}
-                                            onmousedown={toggle_combined}>
-                                            {if props.show_combined {"Tiedustelu"} else {"Tavallinen"}}
-                                        </button>
-                                    </div>
-                            </div>
+
 
                             {{
                                 let mngr = &mut mngr[0].clone();
@@ -261,12 +280,18 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                 let blues = mngr.gen_blues(/*oranges.as_ref()*/);
                                 let grays = mngr.gen_grays();
                                 let result = query(&grays, blues, oranges, props.word_length);
-                                if !props.show_combined {
-                                    let ranked = rank(result);
-                                    show_n_answers(ranked, 25)
-                                } else {
-                                    let ranked = rank_scout(result, props.word_length);
-                                    show_n_answers(ranked, 25)
+                                match props.answer_mode {
+                                    AnswerType::Basic => {
+                                        let ranked = rank(result);
+                                        show_n_answers(ranked, 25)
+                                    },
+                                    AnswerType::Scout => {
+                                        let ranked = rank_scout(result, props.word_length);
+                                        show_n_answers(ranked, 25)
+                                    }
+                                    AnswerType::Information => {
+                                        todo!();
+                                    }
                                 }
                             }}
                         </>
