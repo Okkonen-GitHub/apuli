@@ -65,15 +65,53 @@ impl Component for App {
             return;
         }
         let window: Window = window().expect("window not available");
+        let game = self.currect_game.clone();
 
-        let cb = ctx.link().batch_callback(|e: KeyboardEvent| {
+        let cb = ctx.link().batch_callback(move |e: KeyboardEvent| {
             if e.key().chars().count() == 1 {
                 let key = e.key().to_uppercase().chars().next().unwrap();
                 if ALLOWED_KEYS.contains(&key) && !e.ctrl_key() && !e.alt_key() && !e.meta_key() {
                     e.prevent_default();
                     Some(Msg::KeyPress(key))
                 } else {
-                    None
+                    match e.key().trim().chars().next() {
+                        Some(num) => {
+                            let mut num = num.to_digit(10).unwrap_or(9);
+                            if num <= 0 {
+                                num = 11
+                            }
+                            num -= 1;
+
+                            if num <= 5 && !e.ctrl_key() && !e.alt_key() && !e.meta_key() {
+                                e.prevent_default();
+                                let game = game.clone();
+                                let guess_num = game.clone().current_guess.clone();
+
+                                Some(Msg::UpdateTile(
+                                    Tile {
+                                        state: TileState::Blue, // current state
+                                        position: 0 as usize,
+                                        character: 'A',
+                                    },
+                                    0,
+                                ))
+                                // match guess {
+                                //     Some(_letter) => Some(Msg::UpdateTile(
+                                //         Tile {
+                                //             state: TileState::Orange,
+                                //             position: 0 as usize,
+                                //             character: 'A',
+                                //         },
+                                //         0,
+                                //     )),
+                                //     None => None,
+                                // }
+                            } else {
+                                None
+                            }
+                        }
+                        None => None,
+                    }
                 }
             } else if e.key() == "Backspace" {
                 e.prevent_default();

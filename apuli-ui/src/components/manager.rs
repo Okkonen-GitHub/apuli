@@ -27,6 +27,8 @@ impl TileManager {
             return;
         } // do nothing if the character is blank
 
+        // If the same character in the same position exists, we remove the old one (this keeps
+        // each column in sync)
         for (index, managed_tile) in self.tiles.clone().iter().enumerate() {
             if managed_tile.position == tile.position && managed_tile.character == tile.character {
                 self.tiles.remove(index);
