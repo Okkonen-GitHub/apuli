@@ -21,7 +21,7 @@ Katso [NOTICE.MD](NOTICE.MD).
 - [ ] Apuli-dbg : a visual debugging app to ensure correctness of the algorithm
 - [ ] 🏗️ Reduce information in Apuli-ui and other optimizations
   - [x] Show first n words
-  - [ ] Show last n words (and dots in between)
+  - [x] Show last m words (and dots in between)
   - [ ] Let the user decide how many they want (1-100|all, 0-100)
     - If "all" show everything
     - Else show 1-100 best and 0-100 worst (remove duplicates)
