@@ -18,6 +18,7 @@ members = [
     "apuli-cli",
     "apuli-lib",
     "apuli-ui",
+    "apuli-dbg"
 ]
 
 [profile.release]
