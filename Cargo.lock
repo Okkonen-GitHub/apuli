@@ -4,7 +4,7 @@ version = 3
 
 [[package]]
 name = "apuli"
-version = "0.1.0"
+version = "0.2.0"
 
 [[package]]
 name = "apuli-cli"
@@ -15,11 +15,11 @@ dependencies = [
 
 [[package]]
 name = "apuli-lib"
-version = "0.1.0"
+version = "0.2.0"
 
 [[package]]
 name = "apuli-ui"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "apuli-lib",
  "wasm-bindgen",
