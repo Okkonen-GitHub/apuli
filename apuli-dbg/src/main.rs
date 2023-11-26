@@ -1,3 +1,4 @@
+use app::menu_ui;
 use apuli_lib::apuli::query;
 use crossterm::{
     event::{self, KeyCode, KeyEventKind},
@@ -10,6 +11,8 @@ use ratatui::{
 };
 use std::io::{stdout, Result};
 
+mod app;
+
 fn main() -> Result<()> {
     let result = query(&[], None, None, 5);
     let first = result.first().unwrap();
@@ -20,8 +23,7 @@ fn main() -> Result<()> {
 
     loop {
         term.draw(|frame| {
-            let area = frame.size();
-            frame.render_widget(Paragraph::new(format!("{first}")).white().on_black(), area);
+            menu_ui(frame);
         })?;
         if event::poll(std::time::Duration::from_millis(16))? {
             if let event::Event::Key(key) = event::read()? {
