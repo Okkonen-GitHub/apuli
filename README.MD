@@ -19,6 +19,13 @@ Katso [NOTICE.MD](NOTICE.MD).
 - [ ] 🏗️ Fix blue and orange generation in bench, ui, and possibly checking them in lib
 - [ ] Fix benchmarking
 - [ ] Apuli-dbg : a visual debugging app to ensure correctness of the algorithm
+  - Buttons: 
+    - [ ] "run benchmarks"
+    - [ ] "filter results"
+    - [ ] "Go through results" 
+  - Display:
+    - [ ] Games
+    - [ ] Stats
 - [ ] 🏗️ Reduce information in Apuli-ui and other optimizations
   - [x] Show first n words
   - [x] Show last m words (and dots in between)
