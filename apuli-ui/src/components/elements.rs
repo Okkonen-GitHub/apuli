@@ -214,24 +214,24 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
             <span onmousedown={toggle_answer} class="modal-close answer-modal">
                 {"✖"}
             </span>
-                <div>
-                    <label class="label">{"Valitse algoritmi"}</label>
-                    <div class="select-container">
-                        <button class={classes!("select", (props.answer_mode == AnswerType::Basic).then_some("select-active"))}
-                            onmousedown={set_basic}>
-                            { "Perus" }
-                        </button>
-                        <button class={classes!("select", (props.answer_mode == AnswerType::Information).then_some("select-active"))}
-                            onmousedown={set_information}>
-                            { "Informaatio" }
-                        </button>
-                        <button class={classes!("select", (props.answer_mode == AnswerType::Scout).then_some("select-active"))}
-                            onmousedown={set_scout}>
-                            { "Yhdistetty" }
-                        </button>
+            <div>
+                <label class="label">{"Valitse algoritmi"}</label>
+                <div class="select-container">
+                    <button class={classes!("select", (props.answer_mode == AnswerType::Basic).then_some("select-active"))}
+                        onmousedown={set_basic}>
+                        { "Perus" }
+                    </button>
+                    <button class={classes!("select", (props.answer_mode == AnswerType::Information).then_some("select-active"))}
+                        onmousedown={set_information}>
+                        { "Informaatio" }
+                    </button>
+                    <button class={classes!("select", (props.answer_mode == AnswerType::Scout).then_some("select-active"))}
+                        onmousedown={set_scout}>
+                        { "Yhdistetty" }
+                    </button>
 
-                    </div>
                 </div>
+            </div>
             {
                 if props.game_mode == GameMode::Neluli {
                     html! {
@@ -284,7 +284,16 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                                                             let grays = mngr.gen_grays();
                                                                             let result = query(&grays, blues, oranges, props.word_length);
                                                                             let ranked = rank_entropy(&result);
-                                                                            show_n_answers(ranked, 25, 3)
+                                                                            let remaining_entropy = (1000.0*(ranked.len() as f64).log2()).round() / 1000.0;
+                                                                            html! {
+                                                                                <>
+                                                                                <p>
+                                                                                    {"Jäljellä: "}
+                                                                                    { remaining_entropy }
+                                                                                </p>
+                                                                                { show_n_answers(ranked, 25, 3) }
+                                                                                </>
+                                                                            }
                                                                         }}
                                                                 }
                                                             }
@@ -351,7 +360,16 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                     }
                                     AnswerType::Information => {
                                         let ranked = rank_entropy(&result);
-                                        show_n_answers(ranked, 25, 3)
+                                        let remaining_entropy = (ranked.len() as f64).log2();
+                                        html! {
+                                            <>
+                                            <p>
+                                                {"Jäljellä: "}
+                                                { remaining_entropy }
+                                            </p>
+                                            { show_n_answers(ranked, 25, 3) }
+                                            </>
+                                        }
                                     }
                                 }
                             }}
