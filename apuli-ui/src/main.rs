@@ -72,7 +72,7 @@ impl Component for App {
                 let key = e.key().to_uppercase().chars().next().unwrap();
                 if ALLOWED_KEYS.contains(&key) && !e.ctrl_key() && !e.alt_key() && !e.meta_key() {
                     e.prevent_default();
-                    Some(Msg::KeyPress(key))
+                    return Some(Msg::KeyPress(key));
                 } else {
                     if let Some(num) = e.key().trim().chars().next() {
                         let mut num = num.to_digit(10).unwrap_or(9);
@@ -83,23 +83,18 @@ impl Component for App {
 
                         if num <= 5 && !e.ctrl_key() && !e.alt_key() && !e.meta_key() {
                             e.prevent_default();
-                            Some(Msg::UpdateTileShortCut(num as usize))
-                        } else {
-                            None
+                            return Some(Msg::UpdateTileShortCut(num as usize));
                         }
-                    } else {
-                        None
                     }
                 }
             } else if e.key() == "Backspace" {
                 e.prevent_default();
-                Some(Msg::Backspace)
+                return Some(Msg::Backspace);
             } else if e.key() == "Enter" {
                 e.prevent_default();
-                Some(Msg::Enter)
-            } else {
-                None
+                return Some(Msg::Enter);
             }
+            None
         });
 
         let listener =
