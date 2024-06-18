@@ -8,7 +8,7 @@
 #[cfg(test)]
 mod apuli_bench {
 
-    use crate::{apuli::*, util::cache_insert};
+    use apuli_lib::{apuli::*, util::cache_insert};
     use std::collections::HashMap;
 
     // Predetermined first guesses
@@ -225,7 +225,7 @@ mod apuli_bench {
     }
     #[test]
     fn pattern_generation() {
-        use crate::information::{generate_patterns, State};
+        use apuli_lib::information::{generate_patterns, State};
         let remaining = vec![
             "RYHMÄ", "MYÖHÄ", "NÖYRÄ", "HÖYNÄ", "RYÖNÄ", "MYÖDÄ", "MYYRÄ", "MÖNJÄ", "HYHMÄ",
             "HYRRÄ", "MÄYRÄ", "MYYJÄ", "MYYDÄ", "JÄYHÄ", "RÄHMÄ", "HÄRMÄ", "JÄYNÄ", "JÄÄHY",

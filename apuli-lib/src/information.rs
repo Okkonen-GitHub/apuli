@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use crate::util::cache_insert;
 
 #[derive(Default, Copy, Clone, Hash, Eq, PartialEq, Debug)]
-pub(crate) enum State {
+pub enum State {
     #[default]
     Absent,
     Present,
@@ -23,11 +23,11 @@ fn information_entropy(probability: f64) -> f64 {
     -probability.log2()
 }
 
-fn remaining_information(remaining: &[String]) -> f64 {
+pub fn remaining_information(remaining: &[String]) -> f64 {
     (remaining.len() as f64).log2()
 }
 
-pub(crate) fn generate_patterns(
+pub fn generate_patterns(
     guess: String,
     remaining_words: &[String],
 ) -> HashMap<Vec<State>, Vec<String>> {

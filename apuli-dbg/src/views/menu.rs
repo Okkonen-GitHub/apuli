@@ -1,9 +1,7 @@
 use super::util::centered_rect;
-use crate::{App, AppState};
+use crate::{App, AppState, Frame};
 use crossterm::event::KeyCode;
 use ratatui::{prelude::*, widgets::*};
-
-pub type Frame<'a> = ratatui::Frame<'a>;
 
 const MAX_INDEX: usize = 4;
 
@@ -52,7 +50,7 @@ pub(crate) fn menu_input_listener(key: KeyCode, app: &mut App) {
                 3 => app.state = AS::StatisticsView,
                 _ => unreachable!("Ayo something is wrong"),
             }
-            Some(current_sel)
+            Some(0)
         }
         _ => Some(current_sel),
     };

@@ -243,7 +243,7 @@ pub mod apuli {
         true
     }
 
-    pub(crate) fn all_words(word_len: usize) -> Vec<String> {
+    pub fn all_words(word_len: usize) -> Vec<String> {
         let mut words = Vec::new();
         match word_len {
             5 => {
