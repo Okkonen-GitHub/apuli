@@ -153,48 +153,44 @@ fn word_list_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState,
 }
 
 pub(crate) fn benchmarking_input_listener(key: KeyCode, bench: &mut BenchmarkState, app: &mut App) {
-    if bench.selected_pane == BenchmarkPane::Wordlist {
-        match key {
-            KeyCode::Up => bench.word_list_scroll -= 1,
-            KeyCode::Down => bench.word_list_scroll += 1,
-            _ => (),
-        }
-        app.state = AppState::BenchmarkView(*bench);
-        return;
-    }
     let current_sel = app.menu_state.selected().unwrap_or(0);
-    let new_index = match key {
-        KeyCode::Up => {
-            if current_sel > 0 {
-                Some(current_sel - 1)
-            } else {
-                Some(MAX_INDEX - 1)
+    match key {
+        KeyCode::Up => match bench.selected_pane {
+            BenchmarkPane::Wordlist => bench.word_list_scroll -= 1,
+            BenchmarkPane::ActionMenu => {
+                let new_index = if current_sel > 0 {
+                    Some(current_sel - 1)
+                } else {
+                    Some(MAX_INDEX - 1)
+                };
+                app.menu_state.select(new_index);
             }
-        }
-        KeyCode::Down => {
-            if current_sel < MAX_INDEX - 1 {
-                Some(current_sel + 1)
-            } else {
-                Some(0)
+        },
+        KeyCode::Down => match bench.selected_pane {
+            BenchmarkPane::Wordlist => bench.word_list_scroll += 1,
+            BenchmarkPane::ActionMenu => {
+                let new_index = if current_sel < MAX_INDEX - 1 {
+                    Some(current_sel + 1)
+                } else {
+                    Some(0)
+                };
+                app.menu_state.select(new_index);
             }
-        }
+        },
         KeyCode::Enter => {
             use AppState as AS;
             match current_sel {
                 0 => app.state = AS::BenchmarkView(*bench),
                 1 => app.state = AS::FilterView,
                 2 => match bench.game_visible {
-                    Visibility::Hidden => (*bench).game_visible = Visibility::Shown,
-                    Visibility::Shown => {
-                        (*bench).game_visible = Visibility::Hidden;
-                        // dbg!(&bench);
-                    }
+                    Visibility::Hidden => bench.game_visible = Visibility::Shown,
+                    Visibility::Shown => bench.game_visible = Visibility::Hidden,
                 },
                 3 => app.state = AS::StatisticsView,
                 _ => unreachable!("Ayo something is wrong"),
             }
-            app.state = AppState::BenchmarkView(*bench);
-            return;
+            // app.state = AppState::BenchmarkView(*bench);
+            // return;
             // Some(current_sel)
         }
         KeyCode::Char('h') | KeyCode::Char('l') => {
@@ -202,10 +198,8 @@ pub(crate) fn benchmarking_input_listener(key: KeyCode, bench: &mut BenchmarkSta
                 BenchmarkPane::Wordlist => bench.selected_pane = BenchmarkPane::ActionMenu,
                 BenchmarkPane::ActionMenu => bench.selected_pane = BenchmarkPane::Wordlist,
             };
-            Some(0)
         }
-        _ => Some(current_sel),
+        _ => (),
     };
-    app.menu_state.select(new_index);
     app.state = AppState::BenchmarkView(*bench);
 }
