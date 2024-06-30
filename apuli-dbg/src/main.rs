@@ -79,7 +79,7 @@ fn main() -> Result<()> {
             _ => unimplemented!("It's not ready"),
         })?;
 
-        if event::poll(std::time::Duration::from_millis(16))? {
+        if event::poll(std::time::Duration::from_millis(20))? {
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
                     match key.code {
