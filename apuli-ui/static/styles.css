@@ -77,6 +77,11 @@ hr {
     float: right;
 }
 
+.neluli-answer {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
 .example {
     height: 40px;
     max-width: 200px;

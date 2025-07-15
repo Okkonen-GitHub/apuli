@@ -29,6 +29,7 @@ pub enum Msg {
     ToggleMenu,
     ChangeTheme(Theme),
     ChangeMode(GameMode),
+    ToggleCombined,
 }
 
 struct App {
@@ -39,6 +40,7 @@ struct App {
     is_help_visible: bool,
     is_answer_visible: bool,
     is_menu_visible: bool,
+    is_combined: bool
 }
 
 impl Component for App {
@@ -54,6 +56,7 @@ impl Component for App {
             is_help_visible: false,
             is_answer_visible: false,
             is_menu_visible: false,
+            is_combined: false,
         }
     }
 
@@ -175,6 +178,9 @@ impl Component for App {
                 }
                 self.is_menu_visible = false;
             }
+            Msg::ToggleCombined => {
+                self.is_combined = !self.is_combined;
+            }
         }
         true
     }
@@ -249,9 +255,10 @@ impl Component for App {
                         html! {
                             <AnswerModal
                                 callback={cb.clone()}
-                                tile_manager={game.tile_manager[0].clone()}
-                                word_length={self.currect_game.word_length}
-
+                                tile_manager={game.tile_manager.clone()}
+                                word_length={game.word_length}
+                                game_mode={game.mode}
+                                show_combined={self.is_combined}
                             />
                         }
                     }
@@ -260,8 +267,8 @@ impl Component for App {
                             <MenuModal
                                 callback={cb.clone()}
                                 word_length={game.word_length}
-                                theme={self.currect_game.theme}
-                                mode={self.currect_game.mode}
+                                theme={game.theme}
+                                mode={game.mode}
                             />
                         }
                     } else {
