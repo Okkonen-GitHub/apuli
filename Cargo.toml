@@ -6,3 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+
+[profile.release]
+lto = true
+debug = false
+codegen-units = 1
+opt-level = 3
+debug-assertions = false
+strip = true
