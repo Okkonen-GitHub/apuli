@@ -134,8 +134,9 @@ impl Component for App {
             Msg::UpdateTile(tile) => self.tile_manager.update_tile(tile),
             Msg::Clear => {
                 println!("Clear"); // maybe just reload the page?
-                self.currect_game = Game::new(self.currect_game.word_length, self.currect_game.theme); // I guess replacing the game state with the
-                                                                              // default game state works?
+                self.currect_game =
+                    Game::new(self.currect_game.word_length, self.currect_game.theme); // I guess replacing the game state with the
+                                                                                       // default game state works?
                 self.input_handler.current.clear(); // gotta remember to clear the input loop
                 self.tile_manager.tiles.clear(); // also gotta remember to clear tilestates
             }
@@ -156,8 +157,8 @@ impl Component for App {
             }
             Msg::ChangeTheme(theme) => {
                 if self.currect_game.theme != theme {
-                self.currect_game.theme = theme;
-            }
+                    self.currect_game.theme = theme;
+                }
                 self.is_menu_visible = false;
             }
         }
