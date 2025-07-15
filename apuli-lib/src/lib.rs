@@ -273,6 +273,9 @@ pub mod apuli {
     // basically a sorting function
     pub fn rank(words: Vec<String>) -> Vec<(u16, String)> {
         let mut letter_frequency: HashMap<char, Vec<u16>> = HashMap::new();
+        if words.is_empty() {
+            return vec![];
+        }
         let mut result = Vec::new();
         let word_len = words[0].len();
         for word in &words {
