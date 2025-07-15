@@ -1,7 +1,7 @@
 use std::{iter, num::Wrapping};
 
 use super::util::{centered_rect, layout};
-use crate::{App, AppState, Frame, Visibility};
+use crate::{bench, App, AppState, Frame, Visibility};
 use apuli_lib::{
     apuli::{query, rank},
     information::remaining_information,
@@ -16,9 +16,9 @@ pub struct BenchmarkState {
     game_visible: Visibility,
     benchmarking_mode: BenchmarkingMode,
     selected_pane: BenchmarkPane,
-    word_list_scroll: Wrapping<usize>,
+    word_list_scroll: usize,
+    remaining_word_count: usize,
 }
-
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 enum BenchmarkPane {
     #[default]
@@ -99,7 +99,7 @@ fn action_view(frame: &mut Frame<'_>, area: Rect, app: &mut App) {
 }
 
 fn word_list_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState, app: &mut App) {
-    let block = Block::bordered().title(format!("Best words {}", bench.word_list_scroll.0));
+    let block = Block::bordered().title(format!("Best words {}", bench.word_list_scroll));
     let constraints = vec![Constraint::Percentage(50), Constraint::Percentage(50)];
     let area = Layout::default()
         .direction(Direction::Horizontal)
@@ -112,7 +112,7 @@ fn word_list_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState,
         .enumerate()
         .map(|(i, (score, word))| {
             Line::from(format!("{}. {word} | {score}", i + 1).add_modifier(
-                if i == bench.word_list_scroll.0 {
+                if i == bench.word_list_scroll {
                     Modifier::REVERSED
                 } else {
                     Modifier::empty()
@@ -121,17 +121,18 @@ fn word_list_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState,
         })
         .collect();
     let remaining_count = remaining_words.len();
+    bench.remaining_word_count = remaining_count;
+    app.state = AppState::BenchmarkView(*bench);
     let remaining_information = remaining_information(&remaining_words);
 
     let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
         .begin_symbol(Some("↑"))
         .end_symbol(Some("↓"));
 
-    let mut scrollbar_state =
-        ScrollbarState::new(remaining_count).position(bench.word_list_scroll.0);
+    let mut scrollbar_state = ScrollbarState::new(remaining_count).position(bench.word_list_scroll);
     let word_list = Paragraph::new(word_list)
         .block(block)
-        .scroll((bench.word_list_scroll.0 as u16, 0));
+        .scroll((bench.word_list_scroll as u16, 0));
 
     let info_block = Block::bordered().title("Info");
     let txt = Text::from(format!(
@@ -156,7 +157,13 @@ pub(crate) fn benchmarking_input_listener(key: KeyCode, bench: &mut BenchmarkSta
     let current_sel = app.menu_state.selected().unwrap_or(0);
     match key {
         KeyCode::Up => match bench.selected_pane {
-            BenchmarkPane::Wordlist => bench.word_list_scroll -= 1,
+            BenchmarkPane::Wordlist => {
+                if bench.word_list_scroll == 0 {
+                    bench.word_list_scroll = bench.remaining_word_count - 1;
+                } else {
+                    bench.word_list_scroll -= 1;
+                }
+            }
             BenchmarkPane::ActionMenu => {
                 let new_index = if current_sel > 0 {
                     Some(current_sel - 1)
@@ -167,7 +174,13 @@ pub(crate) fn benchmarking_input_listener(key: KeyCode, bench: &mut BenchmarkSta
             }
         },
         KeyCode::Down => match bench.selected_pane {
-            BenchmarkPane::Wordlist => bench.word_list_scroll += 1,
+            BenchmarkPane::Wordlist => {
+                if bench.word_list_scroll == bench.remaining_word_count - 1 {
+                    bench.word_list_scroll = 0;
+                } else {
+                    bench.word_list_scroll += 1;
+                }
+            }
             BenchmarkPane::ActionMenu => {
                 let new_index = if current_sel < MAX_INDEX - 1 {
                     Some(current_sel + 1)
