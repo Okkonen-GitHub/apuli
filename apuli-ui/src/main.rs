@@ -23,6 +23,7 @@ pub enum Msg {
     Backspace,
     ChangeWordLength(usize),
     UpdateTile(Tile, usize),
+    UpdateTileShortCut(usize),
     Clear,
     ToggleAnswer,
     ToggleHelp,
@@ -65,7 +66,6 @@ impl Component for App {
             return;
         }
         let window: Window = window().expect("window not available");
-        let game = self.currect_game.clone();
 
         let cb = ctx.link().batch_callback(move |e: KeyboardEvent| {
             if e.key().chars().count() == 1 {
@@ -74,43 +74,22 @@ impl Component for App {
                     e.prevent_default();
                     Some(Msg::KeyPress(key))
                 } else {
-                    match e.key().trim().chars().next() {
-                        Some(num) => {
-                            let mut num = num.to_digit(10).unwrap_or(9);
-                            if num <= 0 {
-                                num = 11
-                            }
-                            num -= 1;
-
-                            if num <= 5 && !e.ctrl_key() && !e.alt_key() && !e.meta_key() {
-                                e.prevent_default();
-                                let game = game.clone();
-                                let guess_num = game.clone().current_guess.clone();
-
-                                Some(Msg::UpdateTile(
-                                    Tile {
-                                        state: TileState::Blue, // current state
-                                        position: 0 as usize,
-                                        character: 'A',
-                                    },
-                                    0,
-                                ))
-                                // match guess {
-                                //     Some(_letter) => Some(Msg::UpdateTile(
-                                //         Tile {
-                                //             state: TileState::Orange,
-                                //             position: 0 as usize,
-                                //             character: 'A',
-                                //         },
-                                //         0,
-                                //     )),
-                                //     None => None,
-                                // }
-                            } else {
-                                None
-                            }
+                    if let Some(num) = e.key().trim().chars().next() {
+                        let mut num = num.to_digit(10).unwrap_or(9);
+                        if num <= 0 {
+                            num = 11
                         }
-                        None => None,
+                        num -= 1;
+
+                        if num <= 5 && !e.ctrl_key() && !e.alt_key() && !e.meta_key() {
+                            e.prevent_default();
+                            cprint(num);
+                            Some(Msg::UpdateTileShortCut(num as usize))
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
                     }
                 }
             } else if e.key() == "Backspace" {
@@ -180,6 +159,31 @@ impl Component for App {
             Msg::UpdateTile(tile, board_index) => {
                 self.currect_game.tile_manager[board_index].update_tile(tile)
             }
+            Msg::UpdateTileShortCut(tilepos) => {
+                let game = &self.currect_game;
+                if game.mode == GameMode::Neluli {
+                    return false;
+                }
+                if let Some(ch) = self.input_handler.current.get(tilepos) {
+                    let state = {
+                        &game.tile_manager[0]
+                            .tiles
+                            .iter()
+                            .filter(|tile| &tile.character == ch && tile.position == tilepos)
+                            .map(|tile| tile.state.clone())
+                            .next()
+                            .unwrap_or(TileState::Black)
+                    };
+
+                    let tile = Tile {
+                        state: state.clone(),
+                        position: tilepos,
+                        character: *ch,
+                    };
+                    self.currect_game.tile_manager[0].update_tile(tile);
+                }
+            }
+
             Msg::Clear => {
                 self.currect_game = Game::new(
                     self.currect_game.word_length,
