@@ -33,7 +33,7 @@ pub fn toggle_button(props: &ButtonProps) -> Html {
                                 callback.emit(Msg::ToggleAnswer);
                 });
                 html! {
-                <button data-nosnippet="" class={classes!("keyboard-button", "keyboard-button-submit", "correct")}
+                <button data-nosnippet="" class={classes!("btn", "correct")}
                                     onmousedown={onmousedown}>
                     { "VALMIS" }
                 </button>
@@ -59,7 +59,7 @@ pub fn clear_button(props: &ButtonProps) -> Html {
                                 callback.emit(Msg::Clear);
                 });
                 html! {
-                <button data-nosnippet="" class={classes!("keyboard-button", "keyboard-button-submit", "present")}
+                <button data-nosnippet="" class={classes!("btn", "present")}
                                     onmousedown={onmousedown}>
                     { "RESET" }
                 </button>

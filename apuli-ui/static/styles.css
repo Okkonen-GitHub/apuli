@@ -1,12 +1,15 @@
 :root {
-    --present: #c9b458;
+    /* --present: #c9b458; */
+    --present: #DCC664;
     --absent: #3e3e3e;
-    --correct: #6aaa64;
+    /* --correct: #6aaa64; */
+    --correct: #82E47A;
     --unknown: #818384;
     --background: #121212;
     --background-transparent: #12121200;
     --text: #d7dadc;
     --white: #ffffff;
+    --black: #000000;
     --slide-offset-1: 68.5px;
     --slide-offset-2: 135.5px;
     --slide-offset-3: 202.5px;
@@ -422,6 +425,30 @@ header {
     border: 2px solid var(--present);
 }
 
+.btn {
+
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    border: none;
+    border-radius: 6px;
+    color: var(--black);
+
+    touch-action: none;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none; /* Prevent selection on iOS */
+
+    font-weight: bold;
+    padding: 0.5em 0.5em;
+    margin-right: 6px;
+
+    text-transform: uppercase;
+
+    flex: 4;
+}
 .btn-container {
     display: inherit;
     justify-content: space-between;
