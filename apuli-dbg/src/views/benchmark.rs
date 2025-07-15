@@ -34,6 +34,16 @@ enum BenchmarkingMode {
     CherryPick,
 }
 
+impl BenchmarkingMode {
+    fn cycle(&self) -> Self {
+        match &self {
+            Self::Everything => Self::Single,
+            Self::Single => Self::CherryPick,
+            Self::CherryPick => Self::Everything,
+        }
+    }
+}
+
 pub(crate) fn benchmarking_ui(frame: &mut Frame<'_>, bench: &mut BenchmarkState, app: &mut App) {
     let area = frame.size();
 
@@ -48,7 +58,7 @@ pub(crate) fn benchmarking_ui(frame: &mut Frame<'_>, bench: &mut BenchmarkState,
     }
     word_list_view(frame, three_split[0], bench, app);
     game_view(frame, three_split[1], bench, app);
-    action_view(frame, three_split[2], app);
+    action_view(frame, three_split[2], bench, app);
 }
 
 fn game_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState, _app: &mut App) {
@@ -73,12 +83,12 @@ fn game_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState, _app
     }
 }
 
-fn action_view(frame: &mut Frame<'_>, area: Rect, app: &mut App) {
+fn action_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState, app: &mut App) {
     let block = Block::bordered().title("Choose action.").on_black();
     let popup_area = centered_rect(100, 60, area);
 
     let menu_items: [&str; MAX_INDEX] = [
-        "Choose mode",
+        &format!("Cycle modes ({:?})", bench.benchmarking_mode),
         "Run benchmarks",
         "Show/Hide games",
         "Statistics",
@@ -193,7 +203,10 @@ pub(crate) fn benchmarking_input_listener(key: KeyCode, bench: &mut BenchmarkSta
         KeyCode::Enter => {
             use AppState as AS;
             match current_sel {
-                0 => app.state = AS::BenchmarkView(*bench),
+                0 => {
+                    let next_mode = bench.benchmarking_mode.cycle();
+                    bench.benchmarking_mode = next_mode;
+                }
                 1 => app.state = AS::FilterView,
                 2 => match bench.game_visible {
                     Visibility::Hidden => bench.game_visible = Visibility::Shown,
@@ -202,9 +215,6 @@ pub(crate) fn benchmarking_input_listener(key: KeyCode, bench: &mut BenchmarkSta
                 3 => app.state = AS::StatisticsView,
                 _ => unreachable!("Ayo something is wrong"),
             }
-            // app.state = AppState::BenchmarkView(*bench);
-            // return;
-            // Some(current_sel)
         }
         KeyCode::Char('h') | KeyCode::Char('l') => {
             match bench.selected_pane {
