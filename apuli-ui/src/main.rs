@@ -83,7 +83,6 @@ impl Component for App {
 
                         if num <= 5 && !e.ctrl_key() && !e.alt_key() && !e.meta_key() {
                             e.prevent_default();
-                            cprint(num);
                             Some(Msg::UpdateTileShortCut(num as usize))
                         } else {
                             None
