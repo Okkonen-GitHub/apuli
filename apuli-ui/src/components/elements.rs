@@ -1,8 +1,9 @@
 use crate::Msg;
+use crate::cprint;
 use yew::prelude::*;
 
 use super::{game::{Theme, GameMode}, manager::TileManager};
-use apuli_lib::apuli::{query, rank};
+use apuli_lib::apuli::{query, rank, rank_combined, Letter};
 
 #[derive(Properties, PartialEq)]
 pub struct ButtonProps {
@@ -116,7 +117,7 @@ pub fn help_modal(props: &HelpModalProps) -> Html {
     html! {
         <div class="modal">
             <span onmousedown={toggle_help} class="modal-close">{"✖"}</span>
-            <p><i>{"Sanuli "}</i>{"apu"}</p>
+            <p>{"Sanuli apu"}</p>
             <p>{"Syötä arvauksia ja muuta kirjainten värit vastaamaan omaa sanuli peliäsi ja kone kertoo kaikki mahdolliset vaihtoehdot, jotka ovat jäljellä"}</p>
             <p href="https://creativecommons.org/licenses/by/3.0/deed.fi">
                 {"Sanalistojen pohjana on käytetty Kotimaisten kielten keskuksen (Kotus) julkaiseman "}
@@ -184,7 +185,7 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                                                         let oranges = mngr.gen_oranges();
                                                                         let blues = mngr.gen_blues(/*oranges.as_ref()*/);
                                                                         let grays = mngr.gen_grays();
-                                                                        let result = query(&grays, blues.as_ref(), oranges.as_ref(), props.word_length);
+                                                                        let result = query(&grays, blues, oranges, props.word_length);
                                                                         let ranked = rank(result);
 
                                                                         ranked.iter().enumerate().map(|(index, (score, word))| {
@@ -205,15 +206,48 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                     }
                             } else {
                                 
-                                // let mngr = &mut mngr[0].clone();
-                                //             let oranges = mngr.gen_oranges();
-                                //             let blues = mngr.gen_blues(/*oranges.as_ref()*/);
-                                //             let grays = mngr.gen_grays();
-                                //
-                                //             let result = query(&grays, blues.as_ref(), oranges.as_ref(), props.word_length);
-                                //             let ranked = rank(result);
+                                let mngr = &mut mngr.clone();
 
-                                html! {<p>{"hi!"}</p>}
+                                let mut oranges: Vec<Option<Vec<Letter>>> = Vec::new();
+                                let mut blues: Vec<Option<Vec<Letter>>> = Vec::new();
+                                let mut grays: Vec<Vec<Letter>> = Vec::new();
+                                for i in 0..4 {
+                                    let mut manager = mngr[i].clone();
+                                    // let new_oranges = mngr.gen_oranges().as_ref();
+                                    // oranges.push(new_oranges);
+                                    // dbg!(new_oranges);
+                                    // let new_blues = mngr
+                                    //         .gen_blues().clone();
+                                    // let new_blues = new_blues.as_ref();
+                                    // blues.push(new_blues);
+                                    oranges.push(manager.gen_oranges());
+                                    blues.push(manager.gen_blues());
+                                    grays.push(manager.gen_grays());
+                                }
+                                let mut words = Vec::new();
+                                // let blues_n = blues.clone();
+                                for i in 0..4 {
+                                    // Should check for duplicates BUT increase score for the
+                                    // duplicates
+                                    // cprint(&grays[i]); cprint(&i);
+                                    let res = query(&grays[i], blues[i].clone(), oranges[i].clone(), props.word_length);
+                                    if res.len() != 1 {
+                                        res.iter().for_each(|word| {
+                                        words.push(word.clone());
+                                        });
+                                    }
+                                    
+                                }
+                                cprint(&words);
+                                let ranked = rank_combined(&grays, blues, &oranges, words);
+                                html! {
+                                    ranked.iter().enumerate().map(|(index, (score, word))| {
+                                        html ! {
+                                            <p>{index}{".  "}{word}{"  (VR: "} {score} {")"}</p>
+                                        }
+                                    }).collect::<Html>()
+                                }
+
                             }
                         }}
                     </>
@@ -225,7 +259,7 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                             let oranges = mngr.gen_oranges();
                             let blues = mngr.gen_blues(/*oranges.as_ref()*/);
                             let grays = mngr.gen_grays();
-                            let result = query(&grays, blues.as_ref(), oranges.as_ref(), props.word_length);
+                            let result = query(&grays, blues, oranges, props.word_length);
                             let ranked = rank(result);
 
                             ranked.iter().enumerate().map(|(index, (score, word))| {
