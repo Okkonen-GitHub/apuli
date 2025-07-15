@@ -89,7 +89,7 @@ fn game_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState, _app
                 current_game
                     .guesses
                     .get(row - 1)
-                    .unwrap_or(&"AMMEL".to_string())
+                    .unwrap_or(&"".to_string())
                     .chars()
                     .nth(col - 1)
                     .unwrap_or(' ')
@@ -145,9 +145,11 @@ fn word_list_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState,
         .direction(Direction::Horizontal)
         .constraints(constraints)
         .split(area);
+    let current_game = bench.games.front().cloned().unwrap_or_default();
 
-    let remaining_words = query(&[], None, None, app.word_lenght);
-    let word_list: Vec<_> = rank(remaining_words.clone()) // RC later
+    let remaining_words = current_game.remaining_words(app.word_lenght);
+    let word_list: Vec<_> = remaining_words
+        .clone() // RC later
         .into_iter()
         .enumerate()
         .map(|(i, (score, word))| {
@@ -163,7 +165,7 @@ fn word_list_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState,
     let remaining_count = remaining_words.len();
     bench.remaining_word_count = remaining_count;
     app.state = AppState::BenchmarkView(bench.clone());
-    let remaining_information = remaining_information(&remaining_words);
+    let remaining_information = current_game.remaining_information(app.word_lenght);
 
     let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
         .begin_symbol(Some("↑"))
@@ -236,27 +238,41 @@ pub(crate) fn benchmarking_input_listener(key: KeyCode, bench: &mut BenchmarkSta
         },
         KeyCode::Enter => {
             use AppState as AS;
-            match current_sel {
-                0 => {
-                    let next_mode = bench.benchmarking_mode.cycle();
-                    bench.benchmarking_mode = next_mode;
+            match bench.selected_pane {
+                BenchmarkPane::Wordlist => {
+                    let current_game = bench.games.front_mut().unwrap();
+                    current_game.guesses.push(
+                        current_game
+                            .remaining_words(app.word_lenght)
+                            .get(bench.word_list_scroll)
+                            .unwrap()
+                            .1
+                            .clone(),
+                    );
+                    // bench.games.
                 }
-                1 => match bench.benchmarking_mode {
-                    BenchmarkingMode::Single | BenchmarkingMode::Everything => {
-                        if bench.games.is_empty() {
-                            bench.games = bench::init_all_games(app.word_lenght);
-                        } else if BenchmarkingMode::Single == bench.benchmarking_mode {
-                            bench.games.pop_front();
-                        }
+                BenchmarkPane::ActionMenu => match current_sel {
+                    0 => {
+                        let next_mode = bench.benchmarking_mode.cycle();
+                        bench.benchmarking_mode = next_mode;
                     }
-                    BenchmarkingMode::CherryPick => {}
+                    1 => match bench.benchmarking_mode {
+                        BenchmarkingMode::Single | BenchmarkingMode::Everything => {
+                            if bench.games.is_empty() {
+                                bench.games = bench::init_all_games(app.word_lenght);
+                            } else if BenchmarkingMode::Single == bench.benchmarking_mode {
+                                bench.games.pop_front();
+                            }
+                        }
+                        BenchmarkingMode::CherryPick => {}
+                    },
+                    2 => match bench.game_visible {
+                        Visibility::Hidden => bench.game_visible = Visibility::Shown,
+                        Visibility::Shown => bench.game_visible = Visibility::Hidden,
+                    },
+                    3 => app.state = AS::StatisticsView,
+                    _ => unreachable!("Ayo something is wrong"),
                 },
-                2 => match bench.game_visible {
-                    Visibility::Hidden => bench.game_visible = Visibility::Shown,
-                    Visibility::Shown => bench.game_visible = Visibility::Hidden,
-                },
-                3 => app.state = AS::StatisticsView,
-                _ => unreachable!("Ayo something is wrong"),
             }
         }
         KeyCode::Char('h') | KeyCode::Char('l') => {
