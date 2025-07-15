@@ -403,8 +403,6 @@ pub mod apuli {
                 }
             }
             result.insert(0, (score*(app_count as i32), word.to_string()));
-            // score = score*(app_count as i32);
-            // new.push((score, word.to_string()));
             i += 1;
         }
         // handle blues
@@ -456,6 +454,45 @@ pub mod apuli {
         // somehow
         result.sort_unstable_by(|a, b| b.cmp(a));
 
+        result
+    }
+
+    pub fn rank_scout(words: Vec<String>, word_len: usize) -> Vec<(u32, String)> {
+        let all_words = all_words(word_len);
+        let threshold = (words.len() as f64 * 0.7) as u32; // letter in ~70% of words get filtered
+        let mut letters: Vec<(u32, char)> = Vec::new();
+        let mut result = Vec::new();
+        for word in &words {
+            for ltr in word.chars() {
+                let mut app_count = 0;
+                for word in &words {
+                    if word.contains(ltr) {
+                        app_count += 1;
+                    }
+                }
+                if app_count < threshold {
+                    letters.push(
+                        (app_count, ltr)
+                    );
+                }
+            }
+        }
+        for word in all_words {
+            let mut score = 0;
+            for (freq, ltr) in &letters {
+                match word.appearances(&ltr) {
+                    0 => {},
+                    _ => {score += freq},
+                }
+
+            }
+            if score <= 1 {
+                    result.push(
+                    (score, word)
+                );
+            }
+        }
+        result.sort_unstable_by(|a, b| b.cmp(a));
         result
     }
 

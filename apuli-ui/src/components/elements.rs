@@ -1,5 +1,5 @@
 use crate::Msg;
-use crate::cprint;
+use apuli_lib::apuli::rank_scout;
 use yew::prelude::*;
 
 use super::{game::{Theme, GameMode}, manager::TileManager};
@@ -213,13 +213,6 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                 let mut grays: Vec<Vec<Letter>> = Vec::new();
                                 for i in 0..4 {
                                     let mut manager = mngr[i].clone();
-                                    // let new_oranges = mngr.gen_oranges().as_ref();
-                                    // oranges.push(new_oranges);
-                                    // dbg!(new_oranges);
-                                    // let new_blues = mngr
-                                    //         .gen_blues().clone();
-                                    // let new_blues = new_blues.as_ref();
-                                    // blues.push(new_blues);
                                     oranges.push(manager.gen_oranges());
                                     blues.push(manager.gen_blues());
                                     grays.push(manager.gen_grays());
@@ -238,7 +231,7 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                     }
                                     
                                 }
-                                cprint(&words);
+                                // cprint(&words);
                                 let ranked = rank_combined(&grays, blues, &oranges, words);
                                 html! {
                                     ranked.iter().enumerate().map(|(index, (score, word))| {
@@ -254,23 +247,44 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                     }
                 } else { // props.game_mode == GameMode::Sanuli
                     html! {
-                        {{
-                            let mngr = &mut mngr[0].clone();
-                            let oranges = mngr.gen_oranges();
-                            let blues = mngr.gen_blues(/*oranges.as_ref()*/);
-                            let grays = mngr.gen_grays();
-                            let result = query(&grays, blues, oranges, props.word_length);
-                            let ranked = rank(result);
+                        <>
+                            <div>
+                                <label class="label">{"Tiedustelu tila"}</label>
+                                <div class="select-container">
+                                    <button class={classes!("select", (props.show_combined).then(|| Some("select-active")))}
+                                            onmousedown={toggle_combined}>
+                                            {(props.show_combined).then_some("Tiedustelu").unwrap_or("Tavallinen")}
+                                        </button>
+                                    </div>
+                            </div>
 
-                            ranked.iter().enumerate().map(|(index, (score, word))| {
+                            {{
+                                let mngr = &mut mngr[0].clone();
+                                let oranges = mngr.gen_oranges();
+                                let blues = mngr.gen_blues(/*oranges.as_ref()*/);
+                                let grays = mngr.gen_grays();
+                                let result = query(&grays, blues, oranges, props.word_length);
+                                if !props.show_combined {
+                                    let ranked = rank(result);
+
+                                    ranked.iter().enumerate().map(|(index, (score, word))| {
+                                    html ! {
+                                    <p>{index}{".  "}{word}{"  (VR: "} {score} {")"}</p>
+                                    }
+                                    }).collect::<Html>()
+
+                                } else {
+                                    let ranked = rank_scout(result, props.word_length);
+                                    ranked.iter().enumerate().map(|(index, (score, word))| {
                                         html ! {
-                                            <p>{index}{".  "}{word}{"  (VR: "} {score} {")"}</p>
-                                        }
-                                            }).collect::<Html>()
+                                        <p>{index}{".  "}{word}{"  (VR: "} {score} {")"}</p>
+                                            }
+                                    }).collect::<Html>()
+                                }
                             }}
+                        </>
                     }
                 }
-
             }
         </div>
     </>
