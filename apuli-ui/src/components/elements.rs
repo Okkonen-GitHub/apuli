@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, iter::Map};
 
 use crate::Msg;
 use apuli_lib::apuli::rank_scout;
@@ -141,13 +141,16 @@ pub fn help_modal(props: &HelpModalProps) -> Html {
 
 // T would be u16 if I hadn't made different ranking methods use different types
 // This is because theoretically it is possible to have a word with negative score in some cases
-fn show_n_answers<T>(words: Vec<(T, String)>, n: usize) -> Html
+// Shows first n ... last m
+fn show_n_answers<T>(words: Vec<(T, String)>, n: usize, m: usize) -> Html
 where
     T: Display,
 {
-    let words = words.iter().take(n).enumerate();
-    words
-        .map(|(index, (score, word))| {
+    // a little overcomplicated maybe?
+    fn to_html<'a, T: 'a + Display, I: Iterator<Item = (usize, &'a (T, String))>>(
+        iter: I,
+    ) -> Map<I, impl FnMut((usize, &'a (T, String))) -> yew::virtual_dom::VNode> {
+        iter.map(|(index, (score, word))| {
             html! {
                 <p class="answer">
                     // Should say "Bits" if score is in bits
@@ -155,7 +158,27 @@ where
                 </p>
             }
         })
-        .collect::<Html>()
+    }
+    let dots = std::iter::once("...").map(|c| {
+        html! {
+            <p>{c}</p>
+        }
+    });
+    let first = words.iter().take(n).enumerate();
+    let first = to_html(first);
+    let last = words
+        .iter()
+        .enumerate()
+        .skip(n) // remove duplicates
+        .rev()
+        .take(m)
+        .rev();
+    let last = to_html(last);
+    if last.len() > 0 {
+        first.chain(dots).chain(last).collect::<Html>()
+    } else {
+        first.collect::<Html>()
+    }
 }
 
 #[derive(PartialEq, Copy, Clone)]
@@ -233,7 +256,7 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                                                             let grays = mngr.gen_grays();
                                                                             let result = query(&grays, blues, oranges, props.word_length);
                                                                             let ranked = rank(result);
-                                                                            show_n_answers(ranked, 25)
+                                                                            show_n_answers(ranked, 25, 3)
                                                                         }}
                                                                 }
                                                             }
@@ -261,7 +284,7 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                                                             let grays = mngr.gen_grays();
                                                                             let result = query(&grays, blues, oranges, props.word_length);
                                                                             let ranked = rank_entropy(&result);
-                                                                            show_n_answers(ranked, 25)
+                                                                            show_n_answers(ranked, 25, 3)
                                                                         }}
                                                                 }
                                                             }
@@ -300,7 +323,7 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                     }
                                     // cprint(&words);
                                     let ranked = rank_combined(&grays, blues, &oranges, words);
-                                    show_n_answers(ranked, 25)
+                                    show_n_answers(ranked, 25, 3)
                                 }
                             }
                         }}
@@ -320,15 +343,15 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                 match props.answer_mode {
                                     AnswerType::Basic => {
                                         let ranked = rank(result);
-                                        show_n_answers(ranked, 25)
+                                        show_n_answers(ranked, 25, 3)
                                     },
                                     AnswerType::Scout => {
                                         let ranked = rank_scout(result, props.word_length);
-                                        show_n_answers(ranked, 25)
+                                        show_n_answers(ranked, 25, 3)
                                     }
                                     AnswerType::Information => {
                                         let ranked = rank_entropy(&result);
-                                        show_n_answers(ranked, 25)
+                                        show_n_answers(ranked, 25, 3)
                                     }
                                 }
                             }}
