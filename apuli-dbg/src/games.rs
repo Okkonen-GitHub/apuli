@@ -1,3 +1,4 @@
+#[derive(Clone, Debug)]
 pub(crate) struct Game {
     guesses: Vec<String>,
     target: String,
@@ -5,6 +6,6 @@ pub(crate) struct Game {
 
 impl Game {
     fn is_success(&self) -> bool {
-        *self.guesses.last().unwrap_or(&"".to_owned()) == self.target
+        *self.guesses.last().expect("No words were played") == self.target
     }
 }

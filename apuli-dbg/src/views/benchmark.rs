@@ -1,7 +1,5 @@
-use std::{iter, num::Wrapping};
-
 use super::util::{centered_rect, layout};
-use crate::{bench, App, AppState, Frame, Visibility};
+use crate::{games::Game, App, AppState, Frame, Visibility};
 use apuli_lib::{
     apuli::{query, rank},
     information::remaining_information,
@@ -90,7 +88,7 @@ fn action_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState, ap
     let menu_items: [&str; MAX_INDEX] = [
         &format!("Cycle modes ({:?})", bench.benchmarking_mode),
         "Run benchmarks",
-        "Show/Hide games",
+        "Show/Hide games and wordlist",
         "Statistics",
     ];
     // let mut state = ListState::default();
@@ -109,7 +107,14 @@ fn action_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState, ap
 }
 
 fn word_list_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState, app: &mut App) {
-    let block = Block::bordered().title(format!("Best words {}", bench.word_list_scroll));
+    if bench.game_visible == Visibility::Hidden {
+        return;
+    }
+    let block = Block::bordered().title(format!(
+        "Best words {}/{}",
+        bench.word_list_scroll + 1,
+        bench.remaining_word_count
+    ));
     let constraints = vec![Constraint::Percentage(50), Constraint::Percentage(50)];
     let area = Layout::default()
         .direction(Direction::Horizontal)
@@ -145,9 +150,12 @@ fn word_list_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState,
         .scroll((bench.word_list_scroll as u16, 0));
 
     let info_block = Block::bordered().title("Info");
-    let txt = Text::from(format!(
-        "Words remaining: {remaining_count}\nInformation remaining:\n{remaining_information}"
-    ));
+    let txt = Paragraph::new(vec![
+        Line::from(format!("Words remaining: {remaining_count}")),
+        Line::from(format!("Information remaining: {remaining_information}")),
+    ])
+    .block(info_block)
+    .wrap(Wrap { trim: false });
     // frame.render_widget(Clear, area[0]);
     frame.render_widget(word_list, area[0]);
     frame.render_stateful_widget(
@@ -159,8 +167,9 @@ fn word_list_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState,
         }),
         &mut scrollbar_state,
     );
-    frame.render_widget(info_block, area[1]);
-    frame.render_widget(txt, area[1].inner(&Margin::new(1, 1)));
+    // frame.render_widget(info_block, area[1]);
+    frame.render_widget(txt, area[1]);
+    // frame.render_widget(txt, area[1].inner(&Margin::new(1, 1)));
 }
 
 pub(crate) fn benchmarking_input_listener(key: KeyCode, bench: &mut BenchmarkState, app: &mut App) {
