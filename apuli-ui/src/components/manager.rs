@@ -1,4 +1,3 @@
-use crate::cprint;
 use apuli_lib::apuli::Letter;
 use std::collections::HashMap;
 
@@ -44,6 +43,7 @@ impl TileManager {
             self.tiles.push(tile);
         }
     }
+
     pub fn gen_oranges(&mut self) -> Option<Vec<Letter>> {
         let mut oranges = Vec::new();
         let mut cache: HashMap<char, Vec<usize>> = HashMap::new();

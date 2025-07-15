@@ -5,13 +5,13 @@ use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{window, Window};
 
 mod components;
-use crate::components::{manager::*, keyboard::Keyboard, board::Board, game::*, input::InputLoop};
+use crate::components::{manager::*, keyboard::Keyboard, board::Board, game::*, input::InputLoop, elements::ToggleButton};
 
 use apuli_lib::apuli::{query, ALLOWED_KEYS};
 
 pub enum Msg {
     KeyPress(char),
-    Enter,
+    Enter(bool), // bool reprecents if the user wants answers or not
     Backspace,
     ChangeWordLenght,
     UpdateTile(Tile),
@@ -59,7 +59,7 @@ impl Component for App {
                 Some(Msg::Backspace)
             } else if e.key() == "Enter" {
                 e.prevent_default();
-                Some(Msg::Enter)
+                Some(Msg::Enter(false))
             } else {
                 None
             }
@@ -82,8 +82,8 @@ impl Component for App {
                 //web_sys::console::log_1(&format!("{:?}", self.input_handler.current).into());
                 self.currect_game.update_guesses(&self.input_handler);
             },
-            Msg::Enter => {
-                if self.currect_game.is_ready {
+            Msg::Enter(is_ready) => {
+                if is_ready {
                     let mngr = &mut self.tile_manager;
                     let oranges = mngr.gen_oranges();
                     let blues = mngr.gen_blues(oranges.as_ref());
@@ -97,12 +97,12 @@ impl Component for App {
                     cprint("result:"); cprint(result);
 
 
-                } else if self.input_handler.current.len() == self.currect_game.word_length && self.currect_game.current_guess < 5 {
-                    cprint("wtfff");
+                } if self.input_handler.current.len() == self.currect_game.word_length && self.currect_game.current_guess < 5 {
                     self.currect_game.current_guess += 1;
-                    self.input_handler.current.clear() // who would want to insert the same word twice?
-                } if self.currect_game.guesses.last().unwrap().last().unwrap() != &' ' {
-                    self.currect_game.is_ready = true;
+                    self.input_handler.current = self.currect_game.guesses.get(self.currect_game.current_guess).unwrap().to_vec();
+                } else if self.currect_game.current_guess == 5 && self.input_handler.current.len() == self.currect_game.word_length {
+                    self.currect_game.current_guess = 0;
+                    self.input_handler.current = self.currect_game.guesses.get(0).unwrap().to_vec();
                 }
             },
             Msg::Backspace => {
@@ -152,12 +152,14 @@ impl Component for App {
                         tile_states={self.tile_manager.clone()}
                     />
                 </div>
+                <ToggleButton
+                    callback={link.callback(move |msg| msg)}
+                />
                 <Keyboard
                     callback={link.callback(move |msg| msg)}
                     message={"hellou".to_string()}
                     word={"hello".to_string()}
                     keyboard={keyboard_state}
-                    is_guessing={self.currect_game.is_ready}
                 />
             </div>
         }
