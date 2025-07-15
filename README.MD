@@ -8,7 +8,7 @@ Katso [Apuli-ui/NOTICE.MD](./apuli-ui/NOTICE.MD)
 # TODO
 
 1. Support for neluli
-1. Ranking system for guesses
+1. Ranking system for guesses based on information revealed by guess
 1. Refactoring code
 
 ## Apuli-ui
