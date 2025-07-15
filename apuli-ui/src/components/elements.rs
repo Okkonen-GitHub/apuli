@@ -1,7 +1,7 @@
 use crate::Msg;
 use yew::prelude::*;
 
-use super::manager::TileManager;
+use super::{manager::TileManager, game::Theme};
 use apuli_lib::apuli::query;
 
 #[derive(Properties, PartialEq)]
@@ -166,6 +166,7 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
 pub struct MenuModalProps {
     pub callback: Callback<Msg>,
     pub word_length: usize,
+    pub theme: Theme,
 }
 
 #[function_component(MenuModal)]
@@ -175,6 +176,9 @@ pub fn menu_modal(props: &MenuModalProps) -> Html {
 
     let change_word_length_5 = onmousedown!(callback, Msg::ChangeWordLength(5));
     let change_word_length_6 = onmousedown!(callback, Msg::ChangeWordLength(6));
+
+    let change_theme_colorblind = onmousedown!(callback, Msg::ChangeTheme(Theme::Colorblind));
+    let change_theme_dark = onmousedown!(callback, Msg::ChangeTheme(Theme::Dark));
 
     html! {
         <div class="modal">
@@ -192,6 +196,20 @@ pub fn menu_modal(props: &MenuModalProps) -> Html {
                         </button>
                     </div>
                 </div>
+                <div>
+                    <label class="label">{"Teema:"}</label>
+                    <div class="select-container">
+                        <button class={classes!("select", (props.theme == Theme::Dark).then(|| Some("select-active")))}
+                                onmousedown={change_theme_dark}>
+                            {"Tumma"}
+                            </button>
+                        <button class={classes!("select", (props.theme == Theme::Colorblind).then(|| Some("select-active")))}
+                                onmousedown={change_theme_colorblind}>
+                            {"Värisokeille"}
+                        </button>
+                    </div>
+                </div>
+
             <div class="version">
                 <a class="version" href={"https://github.com/okkonen-github/apuli"} target="_blank">{"Apuli-dev"}</a>
             </div>

@@ -59,7 +59,7 @@ pub mod apuli {
             match blues {
                 Some(blues) => {
                     for word in self.clone().iter() {
-                        if !check_blues(blues, &mut word.to_string()) {
+                        if !check_blues(blues, word) {
                             self.remove(self.iter().position(|x| x == word).unwrap());
                         }
                     }
@@ -72,9 +72,9 @@ pub mod apuli {
         }
     }
 
-    fn check_blues(blues: &Vec<Letter>, guess: &mut String) -> bool {
+    fn check_blues(blues: &Vec<Letter>, guess: &String) -> bool {
         /* 
-        *Returns true if enough blues are found in the correct positions (not in the wrong places)
+        *Returns true if some blue is found in the correct position
         Input: "SYÖPÄ", vec![Letter { letter: 'S', color: 1, positions: vec![3,4]}] --> true (sana kelpaa)
         Input: "SYÖPÄ", vec![Letter { letter: 'S', color: 1, positions: vec![0,2]] --> false (sana ei kelpaa)
         */
@@ -88,13 +88,10 @@ pub mod apuli {
             }
             pos += 1;
         }
-        // n blues must be in the word though
+        // one blue must be in the word though
         for blue in blues.iter() {
-            for _pos in blue.positions.as_ref().unwrap() {
-                if !guess.contains(blue.letter) {
-                    return false;
-                }
-                *guess = guess.replacen(blue.letter, "", 1);
+            if !guess.contains(blue.letter) {
+                return false;
             }
         }
         true

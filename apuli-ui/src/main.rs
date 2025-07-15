@@ -27,6 +27,7 @@ pub enum Msg {
     ToggleAnswer,
     ToggleHelp,
     ToggleMenu,
+    ChangeTheme(Theme),
 }
 
 struct App {
@@ -120,10 +121,15 @@ impl Component for App {
                 self.currect_game.update_guesses(&self.input_handler);
             }
             Msg::ChangeWordLength(word_length) => {
+                if word_length == self.currect_game.word_length {
+                    self.is_menu_visible = false;
+                    return true;
+                }
                 self.input_handler.word_len = word_length; //we don't want it to remember old stuff
                 self.input_handler.current.clear(); // so it automatically clears all the state
                 self.tile_manager.tiles.clear();
                 self.currect_game = Game::new(word_length);
+                self.is_menu_visible = false;
             }
             Msg::UpdateTile(tile) => self.tile_manager.update_tile(tile),
             Msg::Clear => {
@@ -148,6 +154,12 @@ impl Component for App {
                 self.is_answer_visible = false;
                 self.is_help_visible = false;
             }
+            Msg::ChangeTheme(theme) => {
+                if self.currect_game.theme != theme {
+                self.currect_game.theme = theme;
+            }
+                self.is_menu_visible = false;
+            }
         }
         true
     }
@@ -167,7 +179,7 @@ impl Component for App {
         let keyboard_state: Vec<char> = ALLOWED_KEYS.iter().map(|c| *c).collect();
         // let guesses = self.currect_game.guesses ;
         html! {
-            <div class={classes!("game", "dark")}>
+            <div class={classes!("game", self.currect_game.theme.to_string())}>
                 <Header
                     on_toggle_help_cb={link.callback(|_| Msg::ToggleHelp)}
                     on_toggle_answer_cb={link.callback(|_| Msg::ToggleMenu)}
@@ -200,6 +212,7 @@ impl Component for App {
                             <MenuModal
                                 callback={link.callback(move |msg| msg)}
                                 word_length={self.currect_game.word_length}
+                                theme={self.currect_game.theme}
                             />
                         }
                     } else {
