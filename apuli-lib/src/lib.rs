@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod bench;
 
-// #[cfg(feature = "information")]
+#[cfg(feature = "information")]
 mod information;
 
 pub mod apuli {
