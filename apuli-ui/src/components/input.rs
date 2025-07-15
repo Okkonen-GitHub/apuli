@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct InputLoop {
     pub word_len: usize,
     pub current: Vec<char>,

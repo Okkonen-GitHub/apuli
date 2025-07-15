@@ -9,7 +9,7 @@ pub struct Game {
     pub word_length: usize,
     pub guesses: Vec<Vec<char>>,
     pub current_guess: usize,
-    pub tile_manager: TileManager,
+    pub tile_manager: Vec<TileManager>,
     pub theme: Theme,
     pub mode: GameMode,
 }
@@ -37,13 +37,19 @@ impl fmt::Display for Theme {
 
 impl Game {
     pub fn new(word_len: usize, current_theme: Theme, game_mode: GameMode) -> Self {
+        let (max_guesses, board_count) = match game_mode {
+            GameMode::Sanuli => (6, 1),
+            GameMode::Neluli => (9, 4),
+        };
         Self {
             word_length: word_len,
             guesses: std::iter::repeat(Vec::with_capacity(word_len))
-                .take(6)
+                .take(max_guesses)
                 .collect::<Vec<_>>(),
             current_guess: 0,
-            tile_manager: TileManager::new(),
+            tile_manager: std::iter::repeat(TileManager::new())
+                .take(board_count)
+                .collect::<Vec<_>>(),
             theme: current_theme,
             mode: game_mode
         }

@@ -22,7 +22,7 @@ pub enum Msg {
     Enter,
     Backspace,
     ChangeWordLength(usize),
-    UpdateTile(Tile),
+    UpdateTile(Tile, usize),
     Clear,
     ToggleAnswer,
     ToggleHelp,
@@ -35,7 +35,7 @@ struct App {
     keyboard_listener: Option<Closure<dyn Fn(KeyboardEvent)>>,
     input_handler: InputLoop,
     currect_game: Game,
-    tile_manager: TileManager,
+    // tile_manager: TileManager,
     is_help_visible: bool,
     is_answer_visible: bool,
     is_menu_visible: bool,
@@ -50,7 +50,7 @@ impl Component for App {
             keyboard_listener: None,
             input_handler: InputLoop::new(5, Vec::new()),
             currect_game: Game::new(5, Theme::Dark, GameMode::Sanuli),
-            tile_manager: TileManager::new(),
+            // tile_manager: TileManager::new(),
             is_help_visible: false,
             is_answer_visible: false,
             is_menu_visible: false,
@@ -128,17 +128,19 @@ impl Component for App {
                 }
                 self.input_handler.word_len = word_length; //we don't want it to remember old stuff
                 self.input_handler.reset(); // so it automatically clears all the state
-                self.tile_manager.reset();
+                self.currect_game.tile_manager.iter_mut().for_each(|mngr| mngr.reset());
                 self.currect_game = Game::new(word_length, self.currect_game.theme, self.currect_game.mode);
                 self.is_menu_visible = false;
             }
-            Msg::UpdateTile(tile) => self.tile_manager.update_tile(tile),
+            Msg::UpdateTile(tile, board_index) => self.currect_game.tile_manager[board_index].update_tile(tile),
             Msg::Clear => {
                 self.currect_game =
                     Game::new(self.currect_game.word_length, self.currect_game.theme, self.currect_game.mode); // I guess replacing the game state with the
                                                                                        // default game state works?
                 self.input_handler.reset(); // gotta remember to clear the input loop
-                self.tile_manager.reset() // also gotta remember to clear tilestates
+                
+                // also gotta remember to clear tilestates
+                self.currect_game.tile_manager.iter_mut().for_each(|manager| manager.reset());
             }
             Msg::ToggleHelp => {
                 self.is_help_visible = !self.is_help_visible;
@@ -168,7 +170,7 @@ impl Component for App {
                         self.currect_game.theme,
                         mode,
                     );
-                    self.tile_manager.reset();
+                    self.currect_game.tile_manager.iter_mut().for_each(|manager: &mut TileManager| manager.reset());
                     self.input_handler.reset();
                 }
                 self.is_menu_visible = false;
@@ -190,6 +192,9 @@ impl Component for App {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let link = ctx.link();
         let keyboard_state: Vec<char> = ALLOWED_KEYS.iter().map(|c| *c).collect();
+
+        let game = &self.currect_game;
+        let cb = link.callback(move |msg| msg);
         // let guesses = self.currect_game.guesses ;
         html! {
             <div class={classes!("game", self.currect_game.theme.to_string())}>
@@ -198,23 +203,53 @@ impl Component for App {
                     on_toggle_answer_cb={link.callback(|_| Msg::ToggleMenu)}
                     title={"Apuli"}
                 />
-                <div class="board-container">
-                    <Board
-                        guesses={self.currect_game.guesses.clone()} // clone for now..?
-                        current_guess={self.currect_game.current_guess}
-                        word_length={self.currect_game.word_length}
-                        cb={link.callback(move |msg| msg)}
-                        tile_states={self.tile_manager.clone()}
-                    />
-                </div>
+            {
+                match self.currect_game.mode {
+                    GameMode::Sanuli => html! {
+                        <div class="board-container">
+                            <Board
+                                guesses={game.guesses.clone()} // clone for now..?
+                                current_guess={game.current_guess}
+                                word_length={game.word_length}
+                                cb={cb.clone()}
+                                tile_states={game.tile_manager[0].clone()}
+                                mode={game.mode}
+                                max_guesses={game.max_guesses()}
+                                board_index={0}
+                            />
+                         </div>
+                        },
+                    GameMode::Neluli => html! {
+                                <div class="quadruple-container">
+                                    <div class="quadruple-grid">
+                                        {(0..4).into_iter().map(|i| {
+                                            html! {
+                                                <Board
+                                                    guesses={game.guesses.clone()}
+                                                    current_guess={game.current_guess}
+                                                    cb={cb.clone()}
+                                                    max_guesses={game.max_guesses()}
+                                                    mode={game.mode}
+                                                    word_length={game.word_length}
+                                                    tile_states={game.tile_manager[i].clone()}
+                                                    board_index={i}
+                                                />
+                                            }
+                                        }).collect::<Html>()}
+                                    </div>
+                                </div>
+                            }
+                        }
+                }
+               
                 {
                     if self.is_help_visible {
-                        html! { <HelpModal callback={link.callback(move |msg| msg)} /> }
+                        html! { <HelpModal callback={cb.clone()} /> }
                     } else if self.is_answer_visible {
                         html! {
                             <AnswerModal
-                                callback={link.callback(move |msg| msg) }
-                                tile_manager={self.tile_manager.clone()}
+                                callback={cb.clone()}
+                                tile_manager={game.tile_manager[0].clone()}
                                 word_length={self.currect_game.word_length}
 
                             />
@@ -223,8 +258,8 @@ impl Component for App {
                     else if self.is_menu_visible {
                         html! {
                             <MenuModal
-                                callback={link.callback(move |msg| msg)}
-                                word_length={self.currect_game.word_length}
+                                callback={cb.clone()}
+                                word_length={game.word_length}
                                 theme={self.currect_game.theme}
                                 mode={self.currect_game.mode}
                             />
@@ -235,14 +270,14 @@ impl Component for App {
                 }
                 <div class="btn-container">
                     <ToggleButton
-                        callback={link.callback(move |msg| msg)}
+                        callback={cb.clone()}
                     />
                     <ClearButton
-                        callback={link.callback(move |msg| msg)}
+                        callback={cb.clone()}
                     />
                 </div>
                 <Keyboard
-                    callback={link.callback(move |msg| msg)}
+                    callback={cb.clone()}
                     message={"hellou".to_string()}
                     word={"hello".to_string()}
                     keyboard={keyboard_state}
