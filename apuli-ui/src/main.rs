@@ -350,5 +350,5 @@ pub fn cprint(m: impl Debug) {
 }
 
 fn main() {
-    yew::start_app::<App>();
+    yew::Renderer::<App>::new().render();
 }
