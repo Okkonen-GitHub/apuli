@@ -2,6 +2,10 @@
 
 Auttaja sovellus [sanuli.fi](https://sanuli.fi) peliä varten
 
+Sisältää verkkopohjaisen käyttöliittymän ja komentorivisovelluksen (vanhentunut).
+
+Demo saatavilla osoitteessa [](http://129.151.218.65/index.html)
+
 
 ## Lähteet ja lisenssit
 Katso [NOTICE.MD](NOTICE.MD)
@@ -12,7 +16,9 @@ Katso [NOTICE.MD](NOTICE.MD)
 - [x] Support for neluli
 - [x] Ranking system for guesses based roughly on information revealed by guess
 - [x] "Scouting" feature
-- [ ] Fix blue and orange generation in bench, ui, and possibly checking them in lib
+- [ ] Fix blue and orange generation in bench, ui, and possibly checking them in lib (in progess)
+- [ ] Apuili-dbg : a visual debugging app to ensure correctness of the algorithm
+- [ ] Reduce information in Apuli-ui and other optimizations
 - [ ] Make the algorithm smarter by including stuff from information theory (rank, scout)
 - [ ] Refactoring code (in progess)
 
@@ -27,7 +33,7 @@ cargo install wasm-bindgen-cli
 ```
 
 
-Käynnistä paikallinen Apuli julkaisu
+Käynnistä paikallinen Apuli(-ui) sovellus ([](http://localhost:8080))
 
 ```shell
 trunk serve --release
@@ -47,9 +53,10 @@ trunk build --release
 
 ## Apuli-cli Käyttöohje
 
-Käyttäminen on toistaiseksi aika ikävää
+Käyttäminen on toistaiseksi aika ikävää, ja tulee todennäköisesti aina olemaan.
+Suosituksena on käyttää selaimessa toimivaa käyttöliittymää (Apuli-ui)
 
-Argumenttien tulee olla järjestyksessä toistaiseksi.
+Argumenttien tulee olla järjestyksessä (`-5|6 -g ... [-b ... -o ...]`) toistaiseksi.
 
 `-5` ja `-6` käytetään valitsemaan sanapituus.
 
