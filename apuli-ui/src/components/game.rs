@@ -1,18 +1,28 @@
 use yew::Properties;
 
+use super::input::InputLoop;
+
 #[derive(Clone, PartialEq, Properties)]
 pub struct Game {
     pub word_length: usize,
-    pub guesses: Vec<Vec<char>>
-
+    pub guesses: Vec<Vec<char>>,
+    pub current_guess: usize,
 }
 
 impl Game {
     pub fn new() -> Self {
         Self {
             word_length: 5,
-            guesses: vec![[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec()]
+            guesses: vec![[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec()],
+            current_guess: 0,
         }
+    }
+    pub fn update_guesses(&mut self, input_handler: &InputLoop) -> &Game {
+        let index = self.current_guess;
+        self.guesses.remove(index);
+        self.guesses.insert(index, input_handler.current.clone());
+        self
+
     }
 }
 
