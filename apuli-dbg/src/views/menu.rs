@@ -1,5 +1,5 @@
 use super::util::centered_rect;
-use crate::{App, AppState, Frame};
+use crate::{views::benchmark::BenchmarkState, App, AppState, Frame};
 use crossterm::event::KeyCode;
 use ratatui::{prelude::*, widgets::*};
 
@@ -44,7 +44,7 @@ pub(crate) fn menu_input_listener(key: KeyCode, app: &mut App) {
         KeyCode::Enter => {
             use AppState as AS;
             match current_sel {
-                0 => app.state = AS::BenchmarkView(crate::Visibility::Shown),
+                0 => app.state = AS::BenchmarkView(BenchmarkState::default()),
                 1 => app.state = AS::FilterView,
                 2 => app.state = AS::ResultView,
                 3 => app.state = AS::StatisticsView,

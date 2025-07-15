@@ -9,11 +9,13 @@ use ratatui::{
     widgets::{ListState, Paragraph},
 };
 use std::{
-    borrow::BorrowMut,
     io::{stdout, Result},
     panic,
 };
-use views::menu::{menu_input_listener, menu_ui};
+use views::{
+    benchmark::BenchmarkState,
+    menu::{menu_input_listener, menu_ui},
+};
 
 use crate::views::benchmark::{benchmarking_input_listener, benchmarking_ui};
 
@@ -23,8 +25,9 @@ mod views;
 
 pub type Frame<'a> = ratatui::Frame<'a>;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Default, Clone, Copy)]
 enum Visibility {
+    #[default]
     Shown,
     Hidden,
 }
@@ -33,7 +36,7 @@ enum Visibility {
 enum AppState {
     #[default]
     MenuView,
-    BenchmarkView(Visibility),
+    BenchmarkView(BenchmarkState),
     FilterView,
     ResultView,
     StatisticsView,
@@ -70,9 +73,9 @@ fn main() -> Result<()> {
     };
 
     loop {
-        term.draw(|frame| match &dbg_app.state {
+        term.draw(|frame| match dbg_app.state {
             AS::MenuView => menu_ui(frame, &mut dbg_app),
-            AS::BenchmarkView(_) => benchmarking_ui(frame, &mut dbg_app),
+            AS::BenchmarkView(mut bench) => benchmarking_ui(frame, &mut bench, &mut dbg_app),
             _ => unimplemented!("It's not ready"),
         })?;
 
@@ -90,7 +93,9 @@ fn main() -> Result<()> {
                     }
                     match dbg_app.state {
                         AS::MenuView => menu_input_listener(key.code, &mut dbg_app),
-                        AS::BenchmarkView(_) => benchmarking_input_listener(key.code, &mut dbg_app),
+                        AS::BenchmarkView(mut bench) => {
+                            benchmarking_input_listener(key.code, &mut bench, &mut dbg_app)
+                        }
                         _ => unimplemented!("MF"),
                     }
                 }
