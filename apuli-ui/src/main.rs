@@ -107,10 +107,10 @@ impl Component for App {
                
         html! {
             <Keyboard
-                callback={link.callback(move |msg| msg)}
-                message={"hellou".to_string()}
-                word={"hello".to_string()}
-                keyboard={keyboard_state}
+            callback={link.callback(move |msg| msg)}
+            message={"hellou".to_string()}
+            word={"hello".to_string()}
+            keyboard={keyboard_state}
             />
         }
     }
