@@ -1,6 +1,6 @@
 use yew::prelude::*;
 
-use crate::components::manager::TileState;
+// use crate::components::manager::TileState;
 use crate::Msg;
 
 
@@ -29,15 +29,15 @@ pub fn keyboard(props: &Props) -> Html {
 
     html! {
         <div class="keyboard">
-            {
-                html! {
-                    <Message
-                        message={props.message.clone()}
-                        word={props.word.clone()}
-                        callback={props.callback.clone()}
-                    />
-                }
-            }
+            // {
+            //     html! {
+            //         <Message
+            //             message={props.message.clone()}
+            //             word={props.word.clone()}
+            //             callback={props.callback.clone()}
+            //         />
+            //     }
+            // }
 
             <div class="keyboard-row">
                 {
@@ -45,13 +45,12 @@ pub fn keyboard(props: &Props) -> Html {
                         let callback = props.callback.clone();
                         let onkeypress = Callback::from(move |e: MouseEvent| {
                             e.prevent_default();
+
                             callback.emit(Msg::KeyPress(*key));
                         });
 
-                        let key_state = props.keyboard.get(key).unwrap_or(&KeyState::Single(TileState::Unknown));
-
                         html! {
-                            <KeyboardButton character={*key} is_hidden={props.is_hidden} onkeypress={onkeypress} key_state={*key_state}/>
+                            <KeyboardButton character={*key} onkeypress={onkeypress} />
                         }
                     }).collect::<Html>()
                 }
@@ -69,10 +68,8 @@ pub fn keyboard(props: &Props) -> Html {
                             callback.emit(Msg::KeyPress(*key));
                         });
 
-                        let key_state = props.keyboard.get(key).unwrap_or(&KeyState::Single(TileState::Unknown));
-
                         html! {
-                            <KeyboardButton character={*key} is_hidden={props.is_hidden} onkeypress={onkeypress} key_state={*key_state}/>
+                            <KeyboardButton character={*key}  onkeypress={onkeypress}/>
                         }
                     }).collect::<Html>()
                 }
@@ -89,19 +86,19 @@ pub fn keyboard(props: &Props) -> Html {
                             callback.emit(Msg::KeyPress(*key));
                         });
 
-                        let key_state = props.keyboard.get(key).unwrap_or(&KeyState::Single(TileState::Unknown));
-
                         html! {
-                            <KeyboardButton character={*key} is_hidden={props.is_hidden} onkeypress={onkeypress} key_state={*key_state}/>
+                            <KeyboardButton character={*key}  onkeypress={onkeypress}/>
                         }
                     }).collect::<Html>()
                 }
                 {
-                    if props.is_guessing {
+                    //TODO FIX
+                    // if props.is_guessing {
+                    if true {
                         let callback = props.callback.clone();
                         let onmousedown = Callback::from(move |e: MouseEvent| {
                             e.prevent_default();
-                            callback.emit(Msg::Guess);
+                            callback.emit(Msg::Enter);
                         });
 
                         html! {
@@ -110,24 +107,11 @@ pub fn keyboard(props: &Props) -> Html {
                                 { "ARVAA" }
                             </button>
                         }
-                    } else if matches!(props.game_mode, GameMode::DailyWord(_) | GameMode::Shared) {
-                        let callback = props.callback.clone();
-                        let onmousedown = Callback::from(move |e: MouseEvent| {
-                            e.prevent_default();
-                            callback.emit(Msg::ChangePreviousGameMode);
-                        });
-
-                        html! {
-                            <button data-nosnippet="" class={classes!("keyboard-button", "keyboard-button-submit", "correct")}
-                                onmousedown={onmousedown}>
-                                { "TAKAISIN" }
-                            </button>
-                        }
                     } else {
                         let callback = props.callback.clone();
                         let onmousedown = Callback::from(move |e: MouseEvent| {
                             e.prevent_default();
-                            callback.emit(Msg::NextWord);
+                            callback.emit(Msg::Clear);
                         });
 
                         html! {
@@ -154,7 +138,8 @@ pub struct KeyboardButtonProps {
 #[function_component(KeyboardButton)]
 pub fn keyboard_button(props: &KeyboardButtonProps) -> Html {
     html! {
-        <button data-nosnippet="" class={classes!("keyboard-button", "unknown")}>
+        <button data-nosnippet="" class={classes!("keyboard-button", "unknown")}
+            onmousedown={props.onkeypress.clone()}>
             { props.character }
         </button>
     }
