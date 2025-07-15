@@ -30,11 +30,11 @@ fn remaining_information(remaining: &[String]) -> f64 {
 pub(crate) fn generate_patterns(
     guess: String,
     remaining_words: &[String],
-) -> HashMap<[State; 5], Vec<String>> {
+) -> HashMap<Vec<State>, Vec<String>> {
     let mut patterns = HashMap::new();
     for a_word in remaining_words {
         let mut word = a_word.clone();
-        let mut pattern: [State; 5] = [State::default(); 5];
+        let mut pattern: Vec<State> = std::iter::repeat(State::Absent).take(guess.len()).collect();
         for (i, letter) in guess.clone().chars().enumerate() {
             if word.chars().nth(i).unwrap() == letter {
                 pattern[i] = State::Correct;
