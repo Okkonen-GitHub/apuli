@@ -51,7 +51,7 @@ impl Game {
                 .take(board_count)
                 .collect::<Vec<_>>(),
             theme: current_theme,
-            mode: game_mode
+            mode: game_mode,
         }
     }
     pub fn update_guesses(&mut self, input_handler: &InputLoop) -> &Self {
