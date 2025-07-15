@@ -38,7 +38,8 @@ Katso [NOTICE.MD](NOTICE.MD).
   - [x] Make it visible in the UI (a 3rd mode)
   - [ ] Benchmark information theory algorithm
 - [ ] 🏗️ Refactoring code
-- [ ] 🏗️ Change colors with numbers (1-5) 
+- [x] Change colors with numbers (1-5)
+- [ ] Apuli-ui: Click to view more information about a guess / guesses
 ## Apuli-ui
 
 Tarvitset ainakin trunk:in ja sen vaatimat jutut, jotka saat seuraavasti:
