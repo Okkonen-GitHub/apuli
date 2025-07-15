@@ -11,12 +11,12 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new() -> Self {
+    pub fn new(word_len: usize) -> Self {
         Self {
-            word_length: 5,
-            guesses: std::iter::repeat(Vec::with_capacity(5))
-                        .take(6)
-                        .collect::<Vec<_>>(),
+            word_length: word_len,
+            guesses: std::iter::repeat(Vec::with_capacity(word_len))
+                .take(6)
+                .collect::<Vec<_>>(),
             current_guess: 0,
             tile_manager: TileManager::new(),
         }

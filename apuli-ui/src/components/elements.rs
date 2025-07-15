@@ -135,19 +135,18 @@ pub struct AnswerModalProps {
 pub fn answer_modal(props: &AnswerModalProps) -> Html {
     let callback = props.callback.clone();
     let toggle_answer = onmousedown!(callback, Msg::ToggleAnswer);
+    let mngr = &mut props.tile_manager.clone();
+    let oranges = mngr.gen_oranges();
+    let blues = mngr.gen_blues(oranges.as_ref());
+    let grays = mngr.gen_grays();
+
+    let result = query(&grays, blues.as_ref(), oranges.as_ref(), props.word_length);
 
     html! {
         <div class="modal">
             <span onmousedown={toggle_answer} class="modal-close">{"✖"}</span>
             {
             {
-                let mngr = &mut props.tile_manager.clone();
-                let oranges = mngr.gen_oranges();
-                let blues = mngr.gen_blues(oranges.as_ref());
-                let grays = mngr.gen_grays();
-
-                let result = query(&grays, blues.as_ref(), oranges.as_ref(), props.word_length);
-
 
                 result.iter().map(|word| {
                     html ! {
@@ -156,13 +155,12 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                 }).collect::<Html>()
             }
 
-
             }
+            <p>{"Yhteensä: "} {result.len()} </p>
 
         </div>
     }
 }
-
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct MenuModalProps {
@@ -178,7 +176,6 @@ pub fn menu_modal(props: &MenuModalProps) -> Html {
     let change_word_length_5 = onmousedown!(callback, Msg::ChangeWordLength(5));
     let change_word_length_6 = onmousedown!(callback, Msg::ChangeWordLength(6));
 
-    
     html! {
         <div class="modal">
             <span onmousedown={toggle_menu} class="modal-close">{"✖"}</span>
