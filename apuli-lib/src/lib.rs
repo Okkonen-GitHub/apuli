@@ -178,7 +178,7 @@ pub mod apuli {
         words
     }
 
-    pub fn query(grays: Vec<Letter>, blues: Option<&Vec<Letter>>, oranges: Option<&Vec<Letter>>, word_lenght: usize) {
+    pub fn query(grays: Vec<Letter>, blues: Option<&Vec<Letter>>, oranges: Option<&Vec<Letter>>, word_lenght: usize) -> Vec<String> {
         let path = PathBuf::from("../apuli-lib/");
         println!("{:?}", path);
         let mut words = all_words(path, word_lenght);
@@ -200,9 +200,7 @@ pub mod apuli {
 
             }
         };
-        for word in &words {
-            println!("{}", word);
-        }
-        println!("Määrä: {}", words.len());
+        words
+        // println!("Määrä: {}", words.len());
     }
 }

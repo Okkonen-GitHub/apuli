@@ -124,27 +124,31 @@ fn main() {
     if blues.as_mut().unwrap().len() == 0 {
         blues = None;
     }
-    match &oranges {
+    let result = match &oranges {
         Some(oranges) => {
             match &blues {
                 Some(blues) => {
-                    query(grays, Some(blues), Some(oranges), word_length);
+                    query(grays, Some(blues), Some(oranges), word_length)
                 },
                 None => {
-                    query(grays, None, Some(oranges), word_length);
+                    query(grays, None, Some(oranges), word_length)
                 }
             }
         }
         None => {
             match &blues {
                 Some(blues) => {
-                    query(grays, Some(&blues), None, word_length);
+                    query(grays, Some(&blues), None, word_length)
+
                 },
                 None => {
-                    query(grays, None, None, word_length);
+                    query(grays, None, None, word_length)
                 }
             }
         }
     };
-
+    for word in &result {
+        println!("{}", word);
+    }
+    println!("Määrä: {}", result.len());
 }
