@@ -24,33 +24,37 @@ mod apuli_bench {
 
             grays
         }
-        fn gen_blues(word: &String, target: &String) -> Vec<Letter> {
+        fn gen_blues(word: &String, target: &String) -> Option<Vec<Letter>> {
             let blues: Vec<Letter> = vec![];
 
-            blues
+            Some(blues)
         }
-        fn gen_oranges(word: &String, target: &String) -> Vec<Letter> {
+        fn gen_oranges(word: &String, target: &String) -> Option<Vec<Letter>> {
             let oranges: Vec<Letter> = vec![];
 
-            oranges
+            Some(oranges)
         }
 
         let words_5 = all_words(5);
         for word in &words_5 {
-            let guesses: &[&str] = &[];
+            let mut guesses: Vec<String> = vec![];
             let mut words = words_5.clone();
             let mut next_guess: String = Default::default();
-            if guesses.is_empty() {
-                next_guess = match rank(all_words(5)).first() {
-                    Some((_, g_word)) => g_word.to_owned(),
-                    None => panic!("No word remaining in possible words"),
-                };
-                let grays = gen_grays(&next_guess, word);
-                let blues = gen_blues(&next_guess, word);
-                let oranges = gen_oranges(&next_guess, word);
-            } else {
-                //
-                todo!()
+            while guesses.len() < 6 {
+                if guesses.is_empty() {
+                    next_guess = match rank(all_words(5)).first() {
+                        Some((_, g_word)) => g_word.to_owned(),
+                        None => panic!("No word remaining in possible words"),
+                    };
+                    guesses.push(next_guess.clone());
+                    let grays = gen_grays(&next_guess, word);
+                    let blues = gen_blues(&next_guess, word);
+                    let oranges = gen_oranges(&next_guess, word);
+                    words = query(&grays, blues, oranges, 5)
+                } else {
+                    rank(words);
+                    todo!()
+                }
             }
         }
     }
