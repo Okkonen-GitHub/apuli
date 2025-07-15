@@ -1,3 +1,7 @@
+use apuli_lib::apuli::query;
+
 fn main() {
-    println!("Hello, world!");
+    let result = query(&[], None, None, 5);
+    let first = result.first().unwrap();
+    println!("{first}");
 }

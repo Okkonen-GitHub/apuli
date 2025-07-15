@@ -14,6 +14,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "apuli-dbg"
+version = "0.1.0"
+dependencies = [
+ "apuli-lib",
+]
+
+[[package]]
 name = "apuli-lib"
 version = "0.2.0"
 

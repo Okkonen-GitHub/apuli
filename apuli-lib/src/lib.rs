@@ -1,4 +1,3 @@
-mod bench;
 pub mod information;
 pub mod util;
 //
