@@ -8,7 +8,10 @@ use super::{
     game::{GameMode, Theme},
     manager::TileManager,
 };
-use apuli_lib::apuli::{query, rank, rank_combined, Letter};
+use apuli_lib::{
+    apuli::{query, rank, rank_combined, Letter},
+    information::rank_entropy,
+};
 
 #[derive(Properties, PartialEq)]
 pub struct ButtonProps {
@@ -135,6 +138,7 @@ where
         .map(|(index, (score, word))| {
             html! {
                 <p class="answer">
+                    // Should say "Bits" if score is in bits
                     {index}{".  "}{word} <wbr/> {format!("  (VR:{score})") }
                 </p>
             }
@@ -290,7 +294,8 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                         show_n_answers(ranked, 25)
                                     }
                                     AnswerType::Information => {
-                                        todo!();
+                                        let ranked = rank_entropy(&result);
+                                        show_n_answers(ranked, 25)
                                     }
                                 }
                             }}
