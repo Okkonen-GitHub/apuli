@@ -4,7 +4,7 @@ Auttaja sovellus [sanuli.fi](https://sanuli.fi) peliä varten
 
 
 ## Lähteet ja lisenssit
-[Apuli-ui/NOTICE.MD](NOTICE.MD)
+Katso [NOTICE.MD](NOTICE.MD)
 
 
 # TODO
