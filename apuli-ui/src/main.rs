@@ -7,7 +7,7 @@ use web_sys::{window, Window};
 mod components;
 use crate::components::{manager::*, keyboard::Keyboard, board::Board, game::*, input::InputLoop};
 
-use apuli_lib::apuli::ALLOWED_KEYS;
+use apuli_lib::apuli::{query, ALLOWED_KEYS};
 
 pub enum Msg {
     KeyPress(char),
@@ -83,12 +83,23 @@ impl Component for App {
                 self.currect_game.update_guesses(&self.input_handler);
             },
             Msg::Enter => {
-                web_sys::console::log_1(&"Enter".into());
-                if self.input_handler.current.len() == self.currect_game.word_length && self.currect_game.current_guess < 5 {
+                if self.currect_game.is_ready {
+                    let mngr = &mut self.tile_manager;
+                    let oranges = mngr.gen_oranges();
+                    let blues = mngr.gen_blues(oranges.as_ref());
+                    let grays = mngr.gen_grays();
+                    
+                    let result = query(grays, blues.as_ref(), oranges.as_ref(), self.currect_game.word_length);
+
+                    cprint(result); cprint("hihiihihi"); cprint(&oranges); 
+
+
+                } else if self.input_handler.current.len() == self.currect_game.word_length && self.currect_game.current_guess < 5 {
                     self.currect_game.current_guess += 1;
                     self.input_handler.current.clear() // who would want to insert the same word twice?
-                } // TODO: go to the beginning maybe, or show the results?
-                
+                } if self.currect_game.guesses.last().unwrap().last().unwrap() != &' ' {
+                    self.currect_game.is_ready = true;
+                }
             },
             Msg::Backspace => {
                 web_sys::console::log_1(&"Backspace".into());
