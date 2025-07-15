@@ -1,8 +1,14 @@
-#[cfg(test)]
 mod bench;
-
-#[cfg(feature = "information")]
 mod information;
+mod util;
+//
+// #[cfg(test)]
+// pub mod bench;
+//
+// #[cfg(feature = "information")]
+// pub mod information;
+//
+// pub mod util;
 
 pub mod apuli {
     use std::collections::HashMap;
