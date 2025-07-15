@@ -7,6 +7,12 @@ edition = "2021"
 
 [dependencies]
 
+[lib]
+name = "apuli_lib"
+path = "apuli-lib/src/lib.rs"
+
+# [[bin]] isn't specified because apuli-cli is pretty much deprecated
+
 [workspace]
 members = [
     "apuli-cli",

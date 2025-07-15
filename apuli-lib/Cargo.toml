@@ -11,3 +11,12 @@ information = []
 
 [dependencies]
 
+
+# will eventually customize release builds per package..
+# [profile.release]
+# lto = true
+# debug = false
+# codegen-units = 1
+# opt-level = 3 # this needs to be fast, not small
+# debug-assertions = false
+# strip = true # this could be stripped
