@@ -486,7 +486,7 @@ pub mod apuli {
                 }
 
             }
-            if score <= 1 {
+            if score > 1 {
                     result.push(
                     (score, word)
                 );
