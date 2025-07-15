@@ -14,6 +14,52 @@ struct Letter {
     positions: Option<Vec<usize>>,
 }
 
+trait Removal {
+    fn remove_grey(&mut self, grays: Vec<Letter>) -> Self;
+    fn remove_others(&mut self, blues: Option<&Vec<Letter>>, oranges: Option<&Vec<Letter>>) -> Self;
+}
+
+impl Removal for Vec<String> {
+    fn remove_grey(&mut self, grays: Vec<Letter>) -> Self {
+        for gray in grays.iter() {
+            for word in self.clone().iter() {
+                if word.contains(gray.letter) {
+                    // println!("sanat: {:?}, sana: {}, pos: {pos}", words, word);
+                    self.remove(self.iter().position(|x| x == word).unwrap());
+                    // println!("sanat: {:?}, sana: {}, pos: {pos}", words, word);
+                    // pos -= 1;
+                }
+            }
+        }
+        self.to_vec()
+    }
+    fn remove_others(&mut self, oranges: Option<&Vec<Letter>>, blues: Option<&Vec<Letter>>) -> Self {
+        match oranges {
+            Some(oranges) => {
+                for word in self.clone().iter() {
+                    if !check_oranges(oranges, word) {
+                        self.remove(self.iter().position(|x| x == word).unwrap());
+                    }
+                }
+            },
+            None => {}
+        };
+        match blues {
+            Some(blues) => {
+                for word in self.clone().iter() {
+                    if !check_blues(blues, word) {
+                        self.remove(self.iter().position(|x| x == word).unwrap());
+                    }
+                }
+            },
+            None => {
+                return self.to_vec();
+            }
+        }
+        self.to_vec()
+    }
+}
+
 fn check_blues(blues: &Vec<Letter>, guess: &String) -> bool {
     /* 
     *Returns true if some blue is found in the correct position
@@ -69,46 +115,46 @@ fn check_oranges(oranges: &Vec<Letter>, guess: &String) -> bool {
     true
 }
 
-fn remove_grey(mut words: Vec<String>, grays: Vec<Letter>) -> Vec<String> {
-    for gray in grays.iter() {
-        for word in words.clone().iter() {
-            if word.contains(gray.letter) {
-                // println!("sanat: {:?}, sana: {}, pos: {pos}", words, word);
-                words.remove(words.iter().position(|x| x == word).unwrap());
-                // println!("sanat: {:?}, sana: {}, pos: {pos}", words, word);
-                // pos -= 1;
-            }
-        }
-    }
-    words
-}
+// fn remove_grey(mut words: Vec<String>, grays: Vec<Letter>) -> Vec<String> {
+//     for gray in grays.iter() {
+//         for word in words.clone().iter() {
+//             if word.contains(gray.letter) {
+//                 // println!("sanat: {:?}, sana: {}, pos: {pos}", words, word);
+//                 words.remove(words.iter().position(|x| x == word).unwrap());
+//                 // println!("sanat: {:?}, sana: {}, pos: {pos}", words, word);
+//                 // pos -= 1;
+//             }
+//         }
+//     }
+//     words
+// }
 
-// removes all of the other invalid words
-fn remove_others(mut words: Vec<String>, oranges: Option<&Vec<Letter>>, blues: Option<&Vec<Letter>>) -> Vec<String> {
-    match oranges {
-        Some(oranges) => {
-            for word in words.clone().iter() {
-                if !check_oranges(oranges, word) {
-                    words.remove(words.iter().position(|x| x == word).unwrap());
-                }
-            }
-        },
-        None => {}
-    };
-    match blues {
-        Some(blues) => {
-            for word in words.clone().iter() {
-                if !check_blues(blues, word) {
-                    words.remove(words.iter().position(|x| x == word).unwrap());
-                }
-            }
-        },
-        None => {
-            return words;
-        }
-    }
-    words
-}
+// // removes all of the other invalid words
+// fn remove_others(mut words: Vec<String>, oranges: Option<&Vec<Letter>>, blues: Option<&Vec<Letter>>) -> Vec<String> {
+//     match oranges {
+//         Some(oranges) => {
+//             for word in words.clone().iter() {
+//                 if !check_oranges(oranges, word) {
+//                     words.remove(words.iter().position(|x| x == word).unwrap());
+//                 }
+//             }
+//         },
+//         None => {}
+//     };
+//     match blues {
+//         Some(blues) => {
+//             for word in words.clone().iter() {
+//                 if !check_blues(blues, word) {
+//                     words.remove(words.iter().position(|x| x == word).unwrap());
+//                 }
+//             }
+//         },
+//         None => {
+//             return words;
+//         }
+//     }
+//     words
+// }
 
 fn all_words(base_path: PathBuf, word_len: usize) -> Vec<String> {
     let file = fs::read_to_string(base_path.join(format!("{}_letter_words.txt", word_len)));
@@ -118,17 +164,16 @@ fn all_words(base_path: PathBuf, word_len: usize) -> Vec<String> {
             words.push(line.to_owned())
         }
     }
-    println!("bruh");
     words
 }
 
 fn query(path: PathBuf, grays: Vec<Letter>, blues: Option<&Vec<Letter>>, oranges: Option<&Vec<Letter>>, word_lenght: usize) {
     let mut words = all_words(path, word_lenght);
     
-    words = remove_grey(words, grays);
+    words.remove_grey(grays);
     match oranges {
         Some(oranges) => {
-            words = remove_others(words, Some(&oranges), None);
+            words.remove_others(Some(&oranges), None);
         },
         None => {
 
@@ -136,7 +181,7 @@ fn query(path: PathBuf, grays: Vec<Letter>, blues: Option<&Vec<Letter>>, oranges
     };
     match blues {
         Some(blues) => {
-            words = remove_others(words.clone(), None, Some(&blues));
+            words.remove_others(None, Some(&blues));
         },
         None => {
 
