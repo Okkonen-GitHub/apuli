@@ -19,11 +19,10 @@ macro_rules! onmousedown {
     }};
 }
 
-
 #[function_component(ToggleButton)]
 pub fn toggle_button(props: &ButtonProps) -> Html {
     let callback = props.callback.clone();
-    
+
     html! {
         <>
         <div>
@@ -41,15 +40,14 @@ pub fn toggle_button(props: &ButtonProps) -> Html {
             }}
         </div>
         </>
-    
+
     }
-    
 }
 
 #[function_component(ClearButton)]
 pub fn clear_button(props: &ButtonProps) -> Html {
     let callback = props.callback.clone();
-    
+
     html! {
         <>
         <div>
@@ -67,16 +65,15 @@ pub fn clear_button(props: &ButtonProps) -> Html {
             }}
         </div>
         </>
-    
+
     }
-    
 }
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct HeaderProps {
-        pub on_toggle_answer_cb: Callback<MouseEvent>,
-        pub on_toggle_help_cb: Callback<MouseEvent>,
-        pub title: String,
+    pub on_toggle_answer_cb: Callback<MouseEvent>,
+    pub on_toggle_help_cb: Callback<MouseEvent>,
+    pub title: String,
 }
 
 #[function_component(Header)]
@@ -87,7 +84,7 @@ pub fn header(props: &HeaderProps) -> Html {
             e.prevent_default();
             on_toggle_help_cb.emit(e);
         })
-        };
+    };
 
     let on_toggle_menu_cb = props.on_toggle_answer_cb.clone();
     let onclick_menu = {
@@ -95,19 +92,16 @@ pub fn header(props: &HeaderProps) -> Html {
             e.prevent_default();
             on_toggle_menu_cb.emit(e);
         })
-        };
+    };
 
     html! {
-        <header>
-            <nav onclick={onclick_help} class="title-icon">{"?"}</nav>
-                    <h1 class="title">{&props.title}</h1>
-                <nav onclick={onclick_menu} class="title-icon">{"≡"}</nav>
-            </header>
-        }
+    <header>
+        <nav onclick={onclick_help} class="title-icon">{"?"}</nav>
+                <h1 class="title">{&props.title}</h1>
+            <nav onclick={onclick_menu} class="title-icon">{"≡"}</nav>
+        </header>
+    }
 }
-
-
-
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct HelpModalProps {
@@ -134,7 +128,7 @@ pub fn help_modal(props: &HelpModalProps) -> Html {
 pub struct AnswerModalProps {
     pub callback: Callback<Msg>,
     pub tile_manager: TileManager,
-    pub word_length: usize
+    pub word_length: usize,
 }
 
 #[function_component(AnswerModal)]
@@ -151,9 +145,9 @@ pub fn anser_modal(props: &AnswerModalProps) -> Html {
                 let oranges = mngr.gen_oranges();
                 let blues = mngr.gen_blues(oranges.as_ref());
                 let grays = mngr.gen_grays();
-                
+
                 let result = query(&grays, blues.as_ref(), oranges.as_ref(), props.word_length);
-                
+
 
                 result.iter().map(|word| {
                     html ! {
@@ -161,10 +155,10 @@ pub fn anser_modal(props: &AnswerModalProps) -> Html {
                     }
                 }).collect::<Html>()
             }
-            
+
 
             }
-            
+
         </div>
     }
 }

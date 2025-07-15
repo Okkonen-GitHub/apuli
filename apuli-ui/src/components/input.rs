@@ -1,4 +1,3 @@
-
 #[derive(Debug)]
 pub struct InputLoop {
     word_len: usize,
@@ -8,7 +7,7 @@ pub struct InputLoop {
 impl InputLoop {
     pub fn new(word_len: usize, current: Vec<char>) -> Self {
         Self { word_len, current }
-    } 
+    }
 
     pub fn insert_char(&mut self, key: char) -> &mut InputLoop {
         self.current.push(key);
@@ -24,5 +23,4 @@ impl InputLoop {
         }
         self
     }
-    
 }

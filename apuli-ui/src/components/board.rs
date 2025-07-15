@@ -1,6 +1,6 @@
+use super::manager::*;
 use crate::Msg;
 use yew::prelude::*;
-use super::manager::*;
 
 use super::manager::TileManager;
 //use crate::components::manager::*;
@@ -52,14 +52,14 @@ pub fn board(props: &Props) -> Html {
                                                 state = "absent".into();
                                                 new_state = TileState::Gray;
                                             }
-                                                
+
                                         }
-                                        
-                                        
+
+
                                         html! {
                                             <div class={format!("tile {}", state)} onclick={Callback::from(move |e: MouseEvent| {
                                                 e.prevent_default();
-                                                
+
                                                 let tile_state = new_state.clone();
                                                 callback.emit(Msg::UpdateTile(
                                                     Tile { state: tile_state, position: index, character: character }
