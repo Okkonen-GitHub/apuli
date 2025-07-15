@@ -17,6 +17,7 @@ pub struct Props {
     pub word: String,
 
     pub keyboard: Vec<char>,
+    pub is_guessing: bool,
 }
 
 #[function_component(Keyboard)]
