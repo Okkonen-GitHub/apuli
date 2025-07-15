@@ -152,4 +152,7 @@ impl TileManager {
     pub fn new() -> Self {
         Self { tiles: vec![] }
     }
+    pub fn reset(&mut self) {
+        self.tiles.clear();
+    }
 }

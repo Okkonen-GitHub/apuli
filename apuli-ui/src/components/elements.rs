@@ -1,7 +1,7 @@
 use crate::{cprint, Msg};
 use yew::prelude::*;
 
-use super::{game::Theme, manager::TileManager};
+use super::{game::{Theme, GameMode}, manager::TileManager};
 use apuli_lib::apuli::{query, rank};
 
 #[derive(Properties, PartialEq)]
@@ -177,6 +177,7 @@ pub struct MenuModalProps {
     pub callback: Callback<Msg>,
     pub word_length: usize,
     pub theme: Theme,
+    pub mode: GameMode,
 }
 
 #[function_component(MenuModal)]
@@ -189,6 +190,9 @@ pub fn menu_modal(props: &MenuModalProps) -> Html {
 
     let change_theme_colorblind = onmousedown!(callback, Msg::ChangeTheme(Theme::Colorblind));
     let change_theme_dark = onmousedown!(callback, Msg::ChangeTheme(Theme::Dark));
+
+    let change_mode_sanuli = onmousedown!(callback, Msg::ChangeMode(GameMode::Sanuli));
+    let change_mode_neluli = onmousedown!(callback, Msg::ChangeMode(GameMode::Neluli));
 
     html! {
         <div class="modal">
@@ -203,6 +207,19 @@ pub fn menu_modal(props: &MenuModalProps) -> Html {
                         <button class={classes!("select", (props.word_length == 6).then(|| Some("select-active")))}
                                 onmousedown={change_word_length_6}>
                             {"6 merkkiä"}
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="label">{"Pelimuoto:"}</label>
+                    <div class="select-container">
+                        <button class={classes!("select", (props.mode == GameMode::Sanuli).then(|| Some("select-active")))}
+                                onmousedown={change_mode_sanuli}>
+                            {"Sanuli"}
+                            </button>
+                        <button class={classes!("select", (props.mode == GameMode::Neluli).then(|| Some("select-active")))}
+                                onmousedown={change_mode_neluli}>
+                            {"Neluli"}
                         </button>
                     </div>
                 </div>

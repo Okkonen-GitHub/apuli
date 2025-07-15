@@ -28,6 +28,7 @@ pub enum Msg {
     ToggleHelp,
     ToggleMenu,
     ChangeTheme(Theme),
+    ChangeMode(GameMode),
 }
 
 struct App {
@@ -48,7 +49,7 @@ impl Component for App {
         Self {
             keyboard_listener: None,
             input_handler: InputLoop::new(5, Vec::new()),
-            currect_game: Game::new(5, Theme::Dark),
+            currect_game: Game::new(5, Theme::Dark, GameMode::Sanuli),
             tile_manager: TileManager::new(),
             is_help_visible: false,
             is_answer_visible: false,
@@ -126,19 +127,18 @@ impl Component for App {
                     return true;
                 }
                 self.input_handler.word_len = word_length; //we don't want it to remember old stuff
-                self.input_handler.current.clear(); // so it automatically clears all the state
-                self.tile_manager.tiles.clear();
-                self.currect_game = Game::new(word_length, self.currect_game.theme);
+                self.input_handler.reset(); // so it automatically clears all the state
+                self.tile_manager.reset();
+                self.currect_game = Game::new(word_length, self.currect_game.theme, self.currect_game.mode);
                 self.is_menu_visible = false;
             }
             Msg::UpdateTile(tile) => self.tile_manager.update_tile(tile),
             Msg::Clear => {
-                println!("Clear"); // maybe just reload the page?
                 self.currect_game =
-                    Game::new(self.currect_game.word_length, self.currect_game.theme); // I guess replacing the game state with the
+                    Game::new(self.currect_game.word_length, self.currect_game.theme, self.currect_game.mode); // I guess replacing the game state with the
                                                                                        // default game state works?
-                self.input_handler.current.clear(); // gotta remember to clear the input loop
-                self.tile_manager.tiles.clear(); // also gotta remember to clear tilestates
+                self.input_handler.reset(); // gotta remember to clear the input loop
+                self.tile_manager.reset() // also gotta remember to clear tilestates
             }
             Msg::ToggleHelp => {
                 self.is_help_visible = !self.is_help_visible;
@@ -158,6 +158,18 @@ impl Component for App {
             Msg::ChangeTheme(theme) => {
                 if self.currect_game.theme != theme {
                     self.currect_game.theme = theme;
+                }
+                self.is_menu_visible = false;
+            }
+            Msg::ChangeMode(mode) => {
+                if mode != self.currect_game.mode {
+                    self.currect_game = Game::new(
+                        self.currect_game.word_length,
+                        self.currect_game.theme,
+                        mode,
+                    );
+                    self.tile_manager.reset();
+                    self.input_handler.reset();
                 }
                 self.is_menu_visible = false;
             }
@@ -214,6 +226,7 @@ impl Component for App {
                                 callback={link.callback(move |msg| msg)}
                                 word_length={self.currect_game.word_length}
                                 theme={self.currect_game.theme}
+                                mode={self.currect_game.mode}
                             />
                         }
                     } else {
