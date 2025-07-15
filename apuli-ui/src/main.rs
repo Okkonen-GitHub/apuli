@@ -2,6 +2,8 @@ use yew::prelude::*;
 use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{window, Window};
 
+mod components;
+use crate::components::manager::*;
 
 use apuli_lib::apuli::ALLOWED_KEYS;
 
@@ -10,7 +12,7 @@ pub enum Msg {
     Enter,
     Backspace,
     ChangeWordLenght,
-    UpdateColor(u8, u8),
+    UpdateTile(Tile),
     Clear,
 }
 
@@ -79,8 +81,8 @@ impl Component for App {
                 web_sys::console::log_1(&"Change word len".into());
                 println!("ChangeWordLenght");
             },
-            Msg::UpdateColor(color, pos) => {
-                web_sys::console::log_1(&format!("color: {} at {}", color, pos).into());
+            Msg::UpdateTile(tile) => {
+                web_sys::console::log_1(&format!("tile: {:?}", tile).into());
             },
             Msg::Clear => {
                 println!("Clear");
