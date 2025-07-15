@@ -114,39 +114,19 @@ fn main() {
             }
         }
     }
-    // println!("grays {:#?}", grays);
+    println!("grays {:#?}", grays);
     // println!("blues {:#?}", blues);
     // println!("oranges {:#?}", oranges);
     // get input and then query
-    if oranges.as_mut().unwrap().len() == 0 {
+    if oranges.as_mut().unwrap().is_empty() {
         oranges = None;
     }
-    if blues.as_mut().unwrap().len() == 0 {
+    if blues.as_mut().unwrap().is_empty() {
         blues = None;
     }
-    let result = match &oranges {
-        Some(oranges) => {
-            match &blues {
-                Some(blues) => {
-                    query(&grays, Some(blues), Some(oranges), word_length)
-                },
-                None => {
-                    query(&grays, None, Some(oranges), word_length)
-                }
-            }
-        }
-        None => {
-            match &blues {
-                Some(blues) => {
-                    query(&grays, Some(&blues), None, word_length)
 
-                },
-                None => {
-                    query(&grays, None, None, word_length)
-                }
-            }
-        }
-    };
+    let result = query(&grays, blues.as_ref(), oranges.as_ref(), word_length);
+    
     for word in &result {
         println!("{}", word);
     }

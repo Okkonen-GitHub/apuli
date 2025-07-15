@@ -89,14 +89,16 @@ impl Component for App {
                     let blues = mngr.gen_blues(oranges.as_ref());
                     let grays = mngr.gen_grays();
                     
-                    let result = query(grays.as_ref(), blues.as_ref(), oranges.as_ref(), self.currect_game.word_length);
+                    let result = query(&grays, blues.as_ref(), oranges.as_ref(), self.currect_game.word_length);
 
-                    cprint(result); cprint("hihiihihi"); cprint(&oranges);
+                    cprint("oranges"); cprint(&oranges);
                     cprint("grays"); cprint(grays);
-                    cprint("blues"); cprint(&blues);
+                    cprint("blues"); cprint(blues.as_ref());
+                    cprint("result:"); cprint(result);
 
 
                 } else if self.input_handler.current.len() == self.currect_game.word_length && self.currect_game.current_guess < 5 {
+                    cprint("wtfff");
                     self.currect_game.current_guess += 1;
                     self.input_handler.current.clear() // who would want to insert the same word twice?
                 } if self.currect_game.guesses.last().unwrap().last().unwrap() != &' ' {
@@ -144,6 +146,7 @@ impl Component for App {
                 <div class="board-container">
                     <Board
                         guesses={self.currect_game.guesses.clone()} // clone for now..?
+                        current_guess={self.currect_game.current_guess}
                         word_length={self.currect_game.word_length}
                         cb={link.callback(move |msg| msg)}
                         tile_states={self.tile_manager.clone()}
@@ -162,7 +165,7 @@ impl Component for App {
 }
 
 pub fn cprint(m: impl Debug) -> () {
-    web_sys::console::log_1(&format!("{:?}", m).into());
+    web_sys::console::log_1(&format!("{:#?}", m).into());
 }
 
 fn main() {
