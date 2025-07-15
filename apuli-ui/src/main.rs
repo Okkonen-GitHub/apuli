@@ -209,7 +209,7 @@ impl Component for App {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let link = ctx.link();
-        let keyboard_state: Vec<char> = ALLOWED_KEYS.iter().copied();
+        let keyboard_state: Vec<char> = ALLOWED_KEYS.to_vec();
 
         let game = &self.currect_game;
         let cb = link.callback(move |msg| msg);
@@ -306,7 +306,7 @@ impl Component for App {
     }
 }
 
-pub fn cprint(m: impl Debug) -> () {
+pub fn cprint(m: impl Debug) {
     web_sys::console::log_1(&format!("{:#?}", m).into());
 }
 

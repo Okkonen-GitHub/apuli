@@ -2,7 +2,10 @@ use crate::Msg;
 use apuli_lib::apuli::rank_scout;
 use yew::prelude::*;
 
-use super::{game::{Theme, GameMode}, manager::TileManager};
+use super::{
+    game::{GameMode, Theme},
+    manager::TileManager,
+};
 use apuli_lib::apuli::{query, rank, rank_combined, Letter};
 
 #[derive(Properties, PartialEq)]
@@ -149,27 +152,26 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
 
     let mngr = props.tile_manager.clone();
 
-
     html! {
     <>
         <div class="modal">
             <span onmousedown={toggle_answer} class="modal-close answer-modal">
                 {"✖"}
             </span>
-            { 
+            {
                 if props.game_mode == GameMode::Neluli {
                     html! {
                         <>
                             <div>
                                 <label class="label">{"Yhdistetty?"}</label>
                                 <div class="select-container">
-                                    <button class={classes!("select", (props.show_combined).then(|| Some("select-active")))}
+                                    <button class={classes!("select", (props.show_combined).then_some("select-active"))}
                                         onmousedown={toggle_combined}>
-                                        {(props.show_combined).then_some("Yhdistetty").unwrap_or("Erikseen")}
+                                        { if props.show_combined {"Yhdistetty"} else {"Erikseen"} }
                                     </button>
                                 </div>
                             </div>
-                        
+
                         {{
                             if !props.show_combined {
                                 html! {
@@ -205,14 +207,14 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                     </div>
                                     }
                             } else {
-                                
+
                                 let mngr = &mut mngr.clone();
 
                                 let mut oranges: Vec<Option<Vec<Letter>>> = Vec::new();
                                 let mut blues: Vec<Option<Vec<Letter>>> = Vec::new();
                                 let mut grays: Vec<Vec<Letter>> = Vec::new();
-                                for i in 0..4 {
-                                    let mut manager = mngr[i].clone();
+                                for board_mngr in mngr.iter().take(4) {
+                                    let mut manager = board_mngr.clone();
                                     oranges.push(manager.gen_oranges());
                                     blues.push(manager.gen_blues());
                                     grays.push(manager.gen_grays());
@@ -229,7 +231,7 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                         words.push(word.clone());
                                         });
                                     }
-                                    
+
                                 }
                                 // cprint(&words);
                                 let ranked = rank_combined(&grays, blues, &oranges, words);
@@ -251,9 +253,9 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                             <div>
                                 <label class="label">{"Tiedustelu tila"}</label>
                                 <div class="select-container">
-                                    <button class={classes!("select", (props.show_combined).then(|| Some("select-active")))}
+                                    <button class={classes!("select", (props.show_combined).then_some("select-active"))}
                                             onmousedown={toggle_combined}>
-                                            {(props.show_combined).then_some("Tiedustelu").unwrap_or("Tavallinen")}
+                                            {if props.show_combined {"Tiedustelu"} else {"Tavallinen"}}
                                         </button>
                                     </div>
                             </div>
@@ -319,11 +321,11 @@ pub fn menu_modal(props: &MenuModalProps) -> Html {
                 <div>
                     <label class="label">{"Sanulien pituus:"}</label>
                     <div class="select-container">
-                        <button class={classes!("select", (props.word_length == 5).then(|| Some("select-active")))}
+                        <button class={classes!("select", (props.word_length == 5).then_some("select-active"))}
                                 onmousedown={change_word_length_5}>
                             {"5 merkkiä"}
                             </button>
-                        <button class={classes!("select", (props.word_length == 6).then(|| Some("select-active")))}
+                        <button class={classes!("select", (props.word_length == 6).then_some("select-active"))}
                                 onmousedown={change_word_length_6}>
                             {"6 merkkiä"}
                         </button>
@@ -332,11 +334,11 @@ pub fn menu_modal(props: &MenuModalProps) -> Html {
                 <div>
                     <label class="label">{"Pelimuoto:"}</label>
                     <div class="select-container">
-                        <button class={classes!("select", (props.mode == GameMode::Sanuli).then(|| Some("select-active")))}
+                        <button class={classes!("select", (props.mode == GameMode::Sanuli).then_some("select-active"))}
                                 onmousedown={change_mode_sanuli}>
                             {"Sanuli"}
                             </button>
-                        <button class={classes!("select", (props.mode == GameMode::Neluli).then(|| Some("select-active")))}
+                        <button class={classes!("select", (props.mode == GameMode::Neluli).then_some("select-active"))}
                                 onmousedown={change_mode_neluli}>
                             {"Neluli"}
                         </button>
@@ -345,11 +347,11 @@ pub fn menu_modal(props: &MenuModalProps) -> Html {
                 <div>
                     <label class="label">{"Teema:"}</label>
                     <div class="select-container">
-                        <button class={classes!("select", (props.theme == Theme::Dark).then(|| Some("select-active")))}
+                        <button class={classes!("select", (props.theme == Theme::Dark).then_some("select-active"))}
                                 onmousedown={change_theme_dark}>
                             {"Tumma"}
                             </button>
-                        <button class={classes!("select", (props.theme == Theme::Colorblind).then(|| Some("select-active")))}
+                        <button class={classes!("select", (props.theme == Theme::Colorblind).then_some("select-active"))}
                                 onmousedown={change_theme_colorblind}>
                             {"Värisokeille"}
                         </button>

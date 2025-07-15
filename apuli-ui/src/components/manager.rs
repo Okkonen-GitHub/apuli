@@ -21,7 +21,7 @@ pub struct Tile {
 }
 
 impl TileManager {
-    pub fn update_tile(&mut self, mut tile: Tile) -> () {
+    pub fn update_tile(&mut self, mut tile: Tile) {
         if tile.character == ' ' {
             return;
         } // do nothing if the character is blank
@@ -66,7 +66,7 @@ impl TileManager {
             });
         }
         if !oranges.is_empty() {
-            return Some(oranges);
+            Some(oranges)
         } else {
             None
         }
@@ -116,7 +116,7 @@ impl TileManager {
             })
         }
         if !blues.is_empty() {
-            return Some(blues);
+            Some(blues)
         } else {
             None
         }

@@ -1,4 +1,4 @@
-use super::{manager::*, game::GameMode};
+use super::{game::GameMode, manager::*};
 use crate::Msg;
 use yew::prelude::*;
 
@@ -37,14 +37,14 @@ pub fn board(props: &Props) -> Html {
                                             .get(index)
                                             .unwrap_or(&' ');
 
-                                        let character = c.clone();
+                                        let character = *c;
                                         let callback = props.cb.clone();
                                         let mut state: String = "".into();
 
                                         let mut new_state = TileState::Black;
                                         // cprint(tiles);
                                         for tile in tiles {
-                                            if tile.character == *c && &tile.position == &index {
+                                            if tile.character == *c && tile.position == index {
                                                 match tile.state {
                                                     TileState::Black => {state = "".into()},
                                                     TileState::Gray => {state = "absent".into()},
@@ -52,7 +52,7 @@ pub fn board(props: &Props) -> Html {
                                                     TileState::Orange => {state = "correct".into()}
                                                 }
                                                 new_state = tile.state.clone();
-                                            } else if tile.character == *c && tile.state == TileState::Gray && state == "" {
+                                            } else if tile.character == *c && tile.state == TileState::Gray && state.is_empty() {
                                                 state = "absent".into();
                                                 new_state = TileState::Gray;
                                             }
@@ -66,7 +66,7 @@ pub fn board(props: &Props) -> Html {
 
                                                 let tile_state = new_state.clone();
                                                 callback.emit(Msg::UpdateTile(
-                                                    Tile { state: tile_state, position: index, character: character },
+                                                    Tile { state: tile_state, position: index, character },
                                                     board_index
                                                 ));
                                             })}>
