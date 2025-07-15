@@ -4,7 +4,7 @@ Auttaja sovellus [sanuli.fi](https://sanuli.fi) peliä varten.
 
 Sisältää verkkopohjaisen käyttöliittymän ja komentorivisovelluksen (vanhentunut).
 
-Demo saatavilla osoitteessa <http://129.151.218.65/index.html>.
+Demo saatavilla osoitteessa <http://158.179.206.202>.
 
 
 ## Lähteet ja lisenssit
