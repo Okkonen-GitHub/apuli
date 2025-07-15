@@ -54,4 +54,10 @@ impl Game {
         self.guesses.insert(index, input_handler.current.clone());
         self
     }
+    pub fn max_guesses(&self) -> usize {
+        match self.mode {
+            GameMode::Sanuli => 6,
+            GameMode::Neluli => 9,
+        }
+    }
 }
