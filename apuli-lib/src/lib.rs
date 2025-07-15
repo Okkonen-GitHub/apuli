@@ -81,7 +81,9 @@ pub mod apuli {
                         for blue in blues {
                             if let Some(oranges) = oranges {
                                 for orange in oranges {
+                                    let mut is_exact = false;
                                     if orange.letter == gray.letter {
+                                        is_exact = true;
                                         is_ominous = true;
                                         known_count += orange.positions.as_ref().unwrap().len();
                                     }
@@ -90,13 +92,19 @@ pub mod apuli {
                                         is_ominous = true;
                                         known_count += 1;
                                     }
-                                    if known_count != 0
-                                        && !word.contains_atleast_n(&blue.letter, known_count)
-                                    {
-                                        if let Some(index) = self.iter().position(|x| x == word) {
-                                            self.remove(index); // the word might have already been
-                                                                // removed earlier so we have to check in this (latter)
-                                                                // case
+                                    if known_count != 0 && is_exact {
+                                        if !word.contains_n(&orange.letter, known_count) {
+                                            if let Some(index) = self.iter().position(|x| x == word) {
+                                                self.remove(index);
+                                            }
+                                        }
+                                    } else if known_count != 0 {
+                                            if !word.contains_atleast_n(&blue.letter, known_count) {
+                                                if let Some(index) = self.iter().position(|x| x == word) {
+                                                    self.remove(index); // the word might have already been
+                                                                        // removed earlier so we have to check in this (latter)
+                                                                        // case
+                                            }
                                         }
                                     }
                                     known_count = 0;
