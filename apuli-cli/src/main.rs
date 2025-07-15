@@ -1,8 +1,7 @@
-use std::env::args;
 use apuli_lib::apuli::*;
+use std::env::args;
 
 fn main() {
-
     let mut grays = Vec::new();
     let mut blues = Some(Vec::new());
     let mut oranges = Some(Vec::new());
@@ -19,8 +18,10 @@ fn main() {
                 println!("Invalid word length");
                 return;
             }
-        },
-        _ => {panic!("Invalid word length")}
+        }
+        _ => {
+            panic!("Invalid word length")
+        }
     }
 
     if args.next() == Some("-g".to_string()) {
@@ -39,37 +40,38 @@ fn main() {
     if args.next() == Some("-b".to_string()) {
         let blues_str: String = args.next().expect("No blues given");
         for c in blues_str.chars() {
-            if !ALLOWED_KEYS.contains(&c.to_uppercase().next().unwrap()) && c != ':' && !ALLOWED_NUMS.contains(&c) {
+            if !ALLOWED_KEYS.contains(&c.to_uppercase().next().unwrap())
+                && c != ':'
+                && !ALLOWED_NUMS.contains(&c)
+            {
                 panic!("Invalid argument: {}", c);
             }
         }
         let mut element = blues_str.split(":");
         loop {
             let mut positions: Vec<usize> = Vec::new();
-            
+
             // println!("{:?}, {:?}", element.next(), element.next());
-            
+
             let ltr = element.next();
             let nums = element.next();
 
             match ltr {
-                Some(ltr) => {
-                    match nums {
-                        Some(nums) => {
-                            for c in nums.chars() {
-                                if !c.is_numeric() {
-                                    panic!("Invalid argument: {}", c);
-                                } else {
-                                    positions.push(c.to_digit(10).unwrap() as usize);
-                                }
+                Some(ltr) => match nums {
+                    Some(nums) => {
+                        for c in nums.chars() {
+                            if !c.is_numeric() {
+                                panic!("Invalid argument: {}", c);
+                            } else {
+                                positions.push(c.to_digit(10).unwrap() as usize);
                             }
-                            blues.as_mut().unwrap().push(Letter {
-                                letter: ltr.chars().next().unwrap().to_uppercase().next().unwrap(),
-                                positions: Some(positions),
-                            });
-                        },
-                        None => break,
+                        }
+                        blues.as_mut().unwrap().push(Letter {
+                            letter: ltr.chars().next().unwrap().to_uppercase().next().unwrap(),
+                            positions: Some(positions),
+                        });
                     }
+                    None => break,
                 },
                 None => break,
             }
@@ -78,37 +80,38 @@ fn main() {
     if args.next() == Some("-o".to_string()) {
         let oranges_str: String = args.next().expect("No blues given");
         for c in oranges_str.chars() {
-            if !ALLOWED_KEYS.contains(&c.to_uppercase().next().unwrap()) && c != ':' && !ALLOWED_NUMS.contains(&c) {
+            if !ALLOWED_KEYS.contains(&c.to_uppercase().next().unwrap())
+                && c != ':'
+                && !ALLOWED_NUMS.contains(&c)
+            {
                 panic!("Invalid argument: {}", c);
             }
         }
         let mut element = oranges_str.split(":");
         loop {
             let mut positions: Vec<usize> = Vec::new();
-            
+
             // println!("{:?}, {:?}", element.next(), element.next());
-            
+
             let ltr = element.next();
             let nums = element.next();
 
             match ltr {
-                Some(ltr) => {
-                    match nums {
-                        Some(nums) => {
-                            for c in nums.chars() {
-                                if !c.is_numeric() {
-                                    panic!("Invalid argument: {}", c);
-                                } else {
-                                    positions.push(c.to_digit(10).unwrap() as usize);
-                                }
+                Some(ltr) => match nums {
+                    Some(nums) => {
+                        for c in nums.chars() {
+                            if !c.is_numeric() {
+                                panic!("Invalid argument: {}", c);
+                            } else {
+                                positions.push(c.to_digit(10).unwrap() as usize);
                             }
-                            oranges.as_mut().unwrap().push(Letter {
-                                letter: ltr.chars().next().unwrap().to_uppercase().next().unwrap(),
-                                positions: Some(positions),
-                            });
-                        },
-                        None => break,
+                        }
+                        oranges.as_mut().unwrap().push(Letter {
+                            letter: ltr.chars().next().unwrap().to_uppercase().next().unwrap(),
+                            positions: Some(positions),
+                        });
                     }
+                    None => break,
                 },
                 None => break,
             }
@@ -125,12 +128,15 @@ fn main() {
         blues = None;
     }
 
-    let result = query(&grays, blues.as_ref(), oranges.as_ref(), word_length);
+    let result = query(&grays, blues, oranges, word_length);
     let ranked = rank(result);
-    
-    let _ = ranked.iter().enumerate().for_each(|(index, (score, word))| {
-        // println!("{index}.  {word}  @[{score}]")
-    });
+
+    let _ = ranked
+        .iter()
+        .enumerate()
+        .for_each(|(index, (score, word))| {
+            // println!("{index}.  {word}  @[{score}]")
+        });
 
     println!("Määrä: {}", ranked.len());
 }
