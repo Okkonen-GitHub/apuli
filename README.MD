@@ -1,14 +1,14 @@
 # Apuli - sanuli auttaja
 
-Auttaja sovellus [sanuli.fi](https://sanuli.fi) peliä varten
+Auttaja sovellus [sanuli.fi](https://sanuli.fi) peliä varten.
 
 Sisältää verkkopohjaisen käyttöliittymän ja komentorivisovelluksen (vanhentunut).
 
-Demo saatavilla osoitteessa <http://129.151.218.65/index.html>
+Demo saatavilla osoitteessa <http://129.151.218.65/index.html>.
 
 
 ## Lähteet ja lisenssit
-Katso [NOTICE.MD](NOTICE.MD)
+Katso [NOTICE.MD](NOTICE.MD).
 
 
 # TODO
@@ -24,7 +24,7 @@ Katso [NOTICE.MD](NOTICE.MD)
 
 ## Apuli-ui
 
-Tarvitset ainakin trunk:in ja sen vaatimat jutut, jotka saat seuraavasti
+Tarvitset ainakin trunk:in ja sen vaatimat jutut, jotka saat seuraavasti:
 
 ```
 rustup target add wasm32-unknown-unknown
@@ -33,13 +33,13 @@ cargo install wasm-bindgen-cli
 ```
 
 
-Käynnistä paikallinen Apuli(-ui) sovellus (<http://localhost:8080>)
+Käynnistä paikallinen Apuli(-ui) sovellus (<http://localhost:8080>):
 
 ```shell
 trunk serve --release
 ```
 
-Tai vaihtoehtoisesti käynnistä paikallinen kehitys palvelin
+Tai vaihtoehtoisesti käynnistä paikallinen kehitys palvelin:
 
 ```shell
 trunk serve
@@ -54,7 +54,7 @@ trunk build --release
 ## Apuli-cli Käyttöohje
 
 Käyttäminen on toistaiseksi aika ikävää, ja tulee todennäköisesti aina olemaan.
-Suosituksena on käyttää selaimessa toimivaa käyttöliittymää (Apuli-ui)
+Suosituksena on käyttää selaimessa toimivaa käyttöliittymää (Apuli-ui).
 
 Argumenttien tulee olla järjestyksessä (`-5|6 -g ... [-b ... -o ...]`) toistaiseksi.
 
