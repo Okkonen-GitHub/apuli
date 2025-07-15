@@ -3,7 +3,7 @@ use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{window, Window};
 
 mod components;
-use crate::components::{manager::*, keyboard::Keyboard, board::Board, game::Game};
+use crate::components::{manager::*, keyboard::Keyboard, board::Board, game::*, input::InputLoop};
 
 use apuli_lib::apuli::ALLOWED_KEYS;
 
@@ -17,7 +17,9 @@ pub enum Msg {
 }
 
 struct App {
-    keyboard_listener: Option<Closure<dyn Fn(KeyboardEvent)>>
+    keyboard_listener: Option<Closure<dyn Fn(KeyboardEvent)>>,
+    input_handler: InputLoop,
+    currect_game: Game,
 }
 
 impl Component for App {
@@ -27,6 +29,8 @@ impl Component for App {
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
             keyboard_listener: None,
+            input_handler: InputLoop::new(5, Vec::new()),
+            currect_game: Game::new(),
         }
     }
 
@@ -70,6 +74,11 @@ impl Component for App {
         match msg {
             Msg::KeyPress(key) => {
                 web_sys::console::log_1(&format!("{}", key).into());
+                self.input_handler.insert_char(key);
+                web_sys::console::log_1(&format!("{:?}", self.input_handler.current).into());
+                self.currect_game.guesses.remove(0);
+                self.currect_game.guesses.push(self.input_handler.current.clone())
+                // self.currect_game.guesses.insert(0, self.input_handler.current.clone())
             },
             Msg::Enter => {
                 web_sys::console::log_1(&"Enter".into());
@@ -104,13 +113,17 @@ impl Component for App {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let link = ctx.link();
         let keyboard_state: Vec<char> = ALLOWED_KEYS.iter().map(|c| *c).collect();
-               
+        // let guesses = self.currect_game.guesses ;
         html! {
             <div class={classes!("game", "dark")}>
                 <div class="board-container">
                     <Board
-                        guesses={vec![[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec()]}
-                        word_length={5}
+                        guesses={self.currect_game.guesses.clone()} // clone for now..?
+                        word_length={self.currect_game.word_length}
+                    
+                    
+                        // guesses={vec![[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec()]}
+                        // word_length={5}
                     />
                 </div>
                 <Keyboard

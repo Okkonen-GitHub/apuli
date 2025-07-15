@@ -7,8 +7,8 @@ pub struct Game {
 
 }
 
-impl Default for Game {
-    fn default() -> Self {
+impl Game {
+    pub fn new() -> Self {
         Self {
             word_length: 5,
             guesses: vec![[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec(),[' '; 5].to_vec()]
