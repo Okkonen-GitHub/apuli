@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use components::elements::AnswerModal;
+use components::elements::{AnswerModal, AnswerType};
 use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{window, Window};
 use yew::prelude::*;
@@ -29,7 +29,7 @@ pub enum Msg {
     ToggleMenu,
     ChangeTheme(Theme),
     ChangeMode(GameMode),
-    ToggleCombined,
+    ChangeAnswerMode(AnswerType),
 }
 
 struct App {
@@ -40,7 +40,7 @@ struct App {
     is_help_visible: bool,
     is_answer_visible: bool,
     is_menu_visible: bool,
-    is_combined: bool,
+    answer_mode: AnswerType,
 }
 
 impl Component for App {
@@ -56,7 +56,7 @@ impl Component for App {
             is_help_visible: false,
             is_answer_visible: false,
             is_menu_visible: false,
-            is_combined: false,
+            answer_mode: AnswerType::Basic,
         }
     }
 
@@ -228,8 +228,11 @@ impl Component for App {
                 }
                 self.is_menu_visible = false;
             }
-            Msg::ToggleCombined => {
-                self.is_combined = !self.is_combined;
+            Msg::ChangeAnswerMode(mode) => {
+                if self.answer_mode == mode {
+                    return false; // no need to rerender if mode doesn't change
+                }
+                self.answer_mode = mode;
             }
         }
         true
@@ -308,7 +311,7 @@ impl Component for App {
                                 tile_manager={game.tile_manager.clone()}
                                 word_length={game.word_length}
                                 game_mode={game.mode}
-                                show_combined={self.is_combined}
+                                answer_mode={self.answer_mode}
                             />
                         }
                     }
