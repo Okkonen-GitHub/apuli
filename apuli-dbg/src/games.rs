@@ -1,7 +1,7 @@
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub(crate) struct Game {
-    guesses: Vec<String>,
-    target: String,
+    pub guesses: Vec<String>,
+    pub target: String,
 }
 
 impl Game {

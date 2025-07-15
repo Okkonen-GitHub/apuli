@@ -1,5 +1,7 @@
+use std::{borrow::Borrow, collections::VecDeque};
+
 use super::util::{centered_rect, layout};
-use crate::{games::Game, App, AppState, Frame, Visibility};
+use crate::{bench, games::Game, App, AppState, Frame, Visibility};
 use apuli_lib::{
     apuli::{query, rank},
     information::remaining_information,
@@ -9,22 +11,23 @@ use ratatui::{layout::Layout, prelude::*, style::Stylize, widgets::*};
 
 const MAX_INDEX: usize = 4;
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone)]
 pub struct BenchmarkState {
     game_visible: Visibility,
     benchmarking_mode: BenchmarkingMode,
     selected_pane: BenchmarkPane,
+    games: VecDeque<Game>,
     word_list_scroll: usize,
     remaining_word_count: usize,
 }
-#[derive(Debug, Default, Clone, Copy, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq)]
 enum BenchmarkPane {
     #[default]
     ActionMenu,
     Wordlist,
 }
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, PartialEq)]
 enum BenchmarkingMode {
     #[default]
     Everything,
@@ -63,7 +66,15 @@ fn game_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState, _app
     if bench.game_visible == Visibility::Hidden {
         return;
     }
+    let current_game = bench.games.front().cloned().unwrap_or_default();
     let rows = layout(area, Direction::Vertical, vec![3, 4, 4, 4, 4, 4, 4]);
+    frame.render_widget(
+        Text::from(current_game.target),
+        rows[0].inner(&Margin {
+            vertical: 1,
+            horizontal: 0,
+        }),
+    );
     for row in 1..7 {
         let columns = layout(rows[row], Direction::Horizontal, vec![3, 6, 6, 6, 6, 6]);
         for col in 1..6 {
@@ -74,7 +85,17 @@ fn game_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState, _app
                 .padding(Padding::new(1, 1, 0, 0))
                 .borders(Borders::all())
                 .style(s);
-            let letter = Span::styled("A", Style::new().white().bold());
+            let letter = Span::styled(
+                current_game
+                    .guesses
+                    .get(row - 1)
+                    .unwrap_or(&"AMMEL".to_string())
+                    .chars()
+                    .nth(col - 1)
+                    .unwrap_or(' ')
+                    .to_string(),
+                Style::new().white().bold(),
+            );
             frame.render_widget(block, letter_box);
             frame.render_widget(letter, letter_box.inner(&Margin::new(2, 1)));
         }
@@ -87,7 +108,11 @@ fn action_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState, ap
 
     let menu_items: [&str; MAX_INDEX] = [
         &format!("Cycle modes ({:?})", bench.benchmarking_mode),
-        "Run benchmarks",
+        match bench.benchmarking_mode {
+            BenchmarkingMode::CherryPick => "Select words",
+            BenchmarkingMode::Everything => "Run everything",
+            BenchmarkingMode::Single => "Play next game",
+        },
         "Show/Hide games and wordlist",
         "Statistics",
     ];
@@ -137,7 +162,7 @@ fn word_list_view(frame: &mut Frame<'_>, area: Rect, bench: &mut BenchmarkState,
         .collect();
     let remaining_count = remaining_words.len();
     bench.remaining_word_count = remaining_count;
-    app.state = AppState::BenchmarkView(*bench);
+    app.state = AppState::BenchmarkView(bench.clone());
     let remaining_information = remaining_information(&remaining_words);
 
     let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
@@ -216,7 +241,16 @@ pub(crate) fn benchmarking_input_listener(key: KeyCode, bench: &mut BenchmarkSta
                     let next_mode = bench.benchmarking_mode.cycle();
                     bench.benchmarking_mode = next_mode;
                 }
-                1 => app.state = AS::FilterView,
+                1 => match bench.benchmarking_mode {
+                    BenchmarkingMode::Single | BenchmarkingMode::Everything => {
+                        if bench.games.is_empty() {
+                            bench.games = bench::init_all_games(app.word_lenght);
+                        } else if BenchmarkingMode::Single == bench.benchmarking_mode {
+                            bench.games.pop_front();
+                        }
+                    }
+                    BenchmarkingMode::CherryPick => {}
+                },
                 2 => match bench.game_visible {
                     Visibility::Hidden => bench.game_visible = Visibility::Shown,
                     Visibility::Shown => bench.game_visible = Visibility::Hidden,
@@ -233,5 +267,5 @@ pub(crate) fn benchmarking_input_listener(key: KeyCode, bench: &mut BenchmarkSta
         }
         _ => (),
     };
-    app.state = AppState::BenchmarkView(*bench);
+    app.state = AppState::BenchmarkView(bench.clone());
 }

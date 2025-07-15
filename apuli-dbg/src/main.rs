@@ -75,7 +75,9 @@ fn main() -> Result<()> {
     loop {
         term.draw(|frame| match dbg_app.state {
             AS::MenuView => menu_ui(frame, &mut dbg_app),
-            AS::BenchmarkView(mut bench) => benchmarking_ui(frame, &mut bench, &mut dbg_app),
+            AS::BenchmarkView(ref mut bench) => {
+                benchmarking_ui(frame, &mut bench.clone(), &mut dbg_app)
+            }
             _ => unimplemented!("It's not ready"),
         })?;
 
@@ -93,8 +95,8 @@ fn main() -> Result<()> {
                     }
                     match dbg_app.state {
                         AS::MenuView => menu_input_listener(key.code, &mut dbg_app),
-                        AS::BenchmarkView(mut bench) => {
-                            benchmarking_input_listener(key.code, &mut bench, &mut dbg_app)
+                        AS::BenchmarkView(ref mut bench) => {
+                            benchmarking_input_listener(key.code, &mut bench.clone(), &mut dbg_app)
                         }
                         _ => unimplemented!("MF"),
                     }
