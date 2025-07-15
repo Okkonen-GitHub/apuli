@@ -1,21 +1,24 @@
 use std::fmt::Debug;
 
+use components::elements::AnswerModal;
 use yew::prelude::*;
 use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{window, Window};
 
 mod components;
-use crate::components::{manager::*, keyboard::Keyboard, board::Board, game::*, input::InputLoop, elements::ToggleButton};
+use crate::components::{manager::*, keyboard::Keyboard, board::Board, game::*, input::InputLoop, elements::{ToggleButton, ClearButton, Header, HelpModal}};
 
-use apuli_lib::apuli::{query, ALLOWED_KEYS};
+use apuli_lib::apuli::ALLOWED_KEYS;
 
 pub enum Msg {
     KeyPress(char),
-    Enter(bool), // bool reprecents if the user wants answers or not
+    Enter,
     Backspace,
     ChangeWordLenght,
     UpdateTile(Tile),
     Clear,
+    ToggleAnswer,
+    ToggleHelp,
 }
 
 struct App {
@@ -23,6 +26,8 @@ struct App {
     input_handler: InputLoop,
     currect_game: Game,
     tile_manager: TileManager,
+    is_help_visible: bool,
+    is_answer_visible: bool,
 }
 
 impl Component for App {
@@ -35,6 +40,8 @@ impl Component for App {
             input_handler: InputLoop::new(5, Vec::new()),
             currect_game: Game::new(),
             tile_manager: TileManager::new(),
+            is_help_visible: false,
+            is_answer_visible: false,
         }
     }
 
@@ -59,7 +66,7 @@ impl Component for App {
                 Some(Msg::Backspace)
             } else if e.key() == "Enter" {
                 e.prevent_default();
-                Some(Msg::Enter(false))
+                Some(Msg::Enter)
             } else {
                 None
             }
@@ -82,22 +89,8 @@ impl Component for App {
                 //web_sys::console::log_1(&format!("{:?}", self.input_handler.current).into());
                 self.currect_game.update_guesses(&self.input_handler);
             },
-            Msg::Enter(is_ready) => {
-                if is_ready {
-                    let mngr = &mut self.tile_manager;
-                    let oranges = mngr.gen_oranges();
-                    let blues = mngr.gen_blues(oranges.as_ref());
-                    let grays = mngr.gen_grays();
-                    
-                    let result = query(&grays, blues.as_ref(), oranges.as_ref(), self.currect_game.word_length);
-
-                    cprint("oranges"); cprint(&oranges);
-                    cprint("grays"); cprint(grays);
-                    cprint("blues"); cprint(blues.as_ref());
-                    cprint("result:"); cprint(result);
-
-
-                } if self.input_handler.current.len() == self.currect_game.word_length && self.currect_game.current_guess < 5 {
+            Msg::Enter => {
+                if self.input_handler.current.len() == self.currect_game.word_length && self.currect_game.current_guess < 5 {
                     self.currect_game.current_guess += 1;
                     self.input_handler.current = self.currect_game.guesses.get(self.currect_game.current_guess).unwrap().to_vec();
                 } else if self.currect_game.current_guess == 5 && self.input_handler.current.len() == self.currect_game.word_length {
@@ -106,7 +99,6 @@ impl Component for App {
                 }
             },
             Msg::Backspace => {
-                web_sys::console::log_1(&"Backspace".into());
                 self.input_handler.remove_char();
                 self.currect_game.update_guesses(&self.input_handler);
             },
@@ -122,6 +114,15 @@ impl Component for App {
                 self.currect_game = Game::new(); // I guess replacing the game state with the
                 // default game state works?
                 self.input_handler.current.clear(); // gotta remember to clear the input loop
+                self.tile_manager.tiles.clear(); // also gotta remember to clear tilestates
+            },
+            Msg::ToggleHelp => {
+                self.is_help_visible = !self.is_help_visible;
+                self.is_answer_visible = false;
+            },
+            Msg::ToggleAnswer => {
+                self.is_answer_visible = !self.is_answer_visible;
+                self.is_help_visible = false;
             },
         }
         true
@@ -143,6 +144,11 @@ impl Component for App {
         // let guesses = self.currect_game.guesses ;
         html! {
             <div class={classes!("game", "dark")}>
+                <Header
+                    on_toggle_help_cb={link.callback(|_| Msg::ToggleHelp)}
+                    on_toggle_answer_cb={link.callback(|_| Msg::ToggleAnswer)}
+                    title={"Apuli"}
+                />
                 <div class="board-container">
                     <Board
                         guesses={self.currect_game.guesses.clone()} // clone for now..?
@@ -152,9 +158,30 @@ impl Component for App {
                         tile_states={self.tile_manager.clone()}
                     />
                 </div>
-                <ToggleButton
-                    callback={link.callback(move |msg| msg)}
-                />
+                {
+                    if self.is_help_visible {
+                        html! { <HelpModal callback={link.callback(move |msg| msg)} /> }
+                    } else if self.is_answer_visible {
+                        html! {
+                            <AnswerModal
+                                callback={link.callback(move |msg| msg) }
+                                tile_manager={self.tile_manager.clone()}
+                                word_length={self.currect_game.word_length}
+                
+                            />
+                        }
+                    } else {
+                        html! {}
+                    }
+                }
+                <div class="btn-container">
+                    <ToggleButton
+                        callback={link.callback(move |msg| msg)}
+                    />
+                    <ClearButton
+                        callback={link.callback(move |msg| msg)}
+                    />
+                </div>
                 <Keyboard
                     callback={link.callback(move |msg| msg)}
                     message={"hellou".to_string()}
