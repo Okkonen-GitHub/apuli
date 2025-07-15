@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod bench;
+
 pub mod apuli {
     use std::collections::HashMap;
 
@@ -232,7 +235,7 @@ pub mod apuli {
         true
     }
 
-    fn all_words(word_len: usize) -> Vec<String> {
+    pub(crate) fn all_words(word_len: usize) -> Vec<String> {
         let mut words = Vec::new();
         match word_len {
             5 => {
@@ -271,6 +274,7 @@ pub mod apuli {
     }
 
     // basically a sorting function
+    // Returns a sorted list of strings and scores for each word
     pub fn rank(words: Vec<String>) -> Vec<(u16, String)> {
         let mut letter_frequency: HashMap<char, Vec<u16>> = HashMap::new();
         if words.is_empty() {
