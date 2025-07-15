@@ -20,7 +20,8 @@ pub mod apuli {
         fn contains_n(&self, letter: &char, n: usize) -> bool;
         // Returns true if string contains AT LEAST n amount of specified letter
         fn contains_atleast_n(&self, letter: &char, n: usize) -> bool;
-        // returns how many times a letter appears in a string 
+
+        // returns how many times a letter appears in a string
         fn appearances(&self, letter: &char) -> usize;
     }
 
@@ -294,7 +295,7 @@ pub mod apuli {
                 if letter_frequency.contains_key(key) {
                     let mut positions: Vec<u16> = letter_frequency.get(key).unwrap().clone();
                     positions[position] = positions[position] + 1u16;
-                    
+
                     letter_frequency.insert(key.clone(), positions.to_vec());
                 } else {
                     let mut positions = vec![0; word_len];
@@ -314,12 +315,12 @@ pub mod apuli {
                         // this increases score for potential orange letters
                         for (index, ltr) in word.chars().enumerate() {
                             if ltr == *ch {
-                                score += val[index]/(n as u16);
+                                score += val[index] / (n as u16);
                             }
                         }
-                        // then we need to increase score for blues 
+                        // then we need to increase score for blues
                         if word.contains(*ch) {
-                            score += val.iter().sum::<u16>()/(n as u16);
+                            score += val.iter().sum::<u16>() / (n as u16);
                         }
                     }
                 }
@@ -334,8 +335,13 @@ pub mod apuli {
         result
     }
     // same as normal rank, but for neluli, so some additional information is used to rank the
-    // words 
-    pub fn rank_combined(all_grays: &Vec<Vec<Letter>>, all_blues: Vec<Option<Vec<Letter>>>, all_oranges: &Vec<Option<Vec<Letter>>>, words: Vec<String>) -> Vec<(i32, String)> {
+    // words
+    pub fn rank_combined(
+        all_grays: &Vec<Vec<Letter>>,
+        all_blues: Vec<Option<Vec<Letter>>>,
+        all_oranges: &Vec<Option<Vec<Letter>>>,
+        words: Vec<String>,
+    ) -> Vec<(i32, String)> {
         let mut letter_frequency: HashMap<char, Vec<i32>> = HashMap::new();
         if words.is_empty() {
             return vec![];
@@ -348,7 +354,7 @@ pub mod apuli {
                 if letter_frequency.contains_key(key) {
                     let mut positions: Vec<i32> = letter_frequency.get(key).unwrap().clone();
                     positions[position] = positions[position] + 1;
-                    
+
                     letter_frequency.insert(key.clone(), positions.to_vec());
                 } else {
                     let mut positions = vec![0; word_len];
@@ -368,12 +374,12 @@ pub mod apuli {
                         // this increases score for potential orange letters
                         for (index, ltr) in word.chars().enumerate() {
                             if ltr == *ch {
-                                score += val[index]/(n as i32);
+                                score += val[index] / (n as i32);
                             }
                         }
-                        // then we need to increase score for blues 
+                        // then we need to increase score for blues
                         if word.contains(*ch) {
-                            score += val.iter().sum::<i32>()/(n as i32);
+                            score += val.iter().sum::<i32>() / (n as i32);
                         }
                     }
                 }
@@ -386,7 +392,10 @@ pub mod apuli {
         // let mut index = 0;
         // let mut new = Vec::new();
         let mut i = 0;
-        let mut words = result.iter().map(|(_score, word)| word.clone()).collect::<Vec<String>>();
+        let mut words = result
+            .iter()
+            .map(|(_score, word)| word.clone())
+            .collect::<Vec<String>>();
         while !words.is_empty() {
             // idk
             let word = &result.clone()[i].1;
@@ -402,7 +411,7 @@ pub mod apuli {
                     words.remove(index);
                 }
             }
-            result.insert(0, (score*(app_count as i32), word.to_string()));
+            result.insert(0, (score * (app_count as i32), word.to_string()));
             i += 1;
         }
         // handle blues
@@ -415,13 +424,13 @@ pub mod apuli {
                         for (i, ltr) in word.chars().enumerate() {
                             if ltr == blue.letter && blue.positions.as_ref().unwrap().contains(&i) {
                                 *score -= 1; // maybe change how much it should be reduced or even
-                                // divided
+                                             // divided
                             }
                         }
                     }
                 }
             }
-        } 
+        }
 
         // then oranges
         for (score, word) in &mut result {
@@ -429,7 +438,9 @@ pub mod apuli {
                 if let Some(oranges) = oranges {
                     for orange in oranges {
                         for (i, ltr) in word.chars().enumerate() {
-                            if ltr == orange.letter && orange.positions.as_ref().unwrap().contains(&i) {
+                            if ltr == orange.letter
+                                && orange.positions.as_ref().unwrap().contains(&i)
+                            {
                                 *score -= 1;
                             }
                         }
@@ -437,7 +448,7 @@ pub mod apuli {
                 }
             }
         }
-        // and finally grays 
+        // and finally grays
         for (score, word) in &mut result {
             for grays in all_grays {
                 for gray in grays {
@@ -471,9 +482,7 @@ pub mod apuli {
                     }
                 }
                 if app_count < threshold {
-                    letters.push(
-                        (app_count, ltr)
-                    );
+                    letters.push((app_count, ltr));
                 }
             }
         }
@@ -481,19 +490,15 @@ pub mod apuli {
             let mut score = 0;
             for (freq, ltr) in &letters {
                 match word.appearances(&ltr) {
-                    0 => {},
-                    _ => {score += freq},
+                    0 => {}
+                    _ => score += freq,
                 }
-
             }
             if score > 1 {
-                    result.push(
-                    (score, word)
-                );
+                result.push((score, word));
             }
         }
         result.sort_unstable_by(|a, b| b.cmp(a));
         result
     }
-
 }
