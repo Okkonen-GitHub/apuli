@@ -15,11 +15,15 @@ use std::{
 };
 use views::menu::{menu_input_listener, menu_ui};
 
-use crate::views::benchmark::benchmarking_ui;
+use crate::views::benchmark::{benchmarking_input_listener, benchmarking_ui};
 
+mod bench;
+mod games;
 mod views;
 
-#[derive(Debug)]
+pub type Frame<'a> = ratatui::Frame<'a>;
+
+#[derive(Debug, PartialEq)]
 enum Visibility {
     Shown,
     Hidden,
@@ -39,6 +43,7 @@ enum AppState {
 pub(crate) struct App {
     state: AppState,
     menu_state: ListState,
+    word_lenght: usize,
 }
 
 fn panic_handler() {
@@ -53,8 +58,6 @@ fn panic_handler() {
 fn main() -> Result<()> {
     panic_handler();
     use AppState as AS;
-    let result = query(&[], None, None, 5);
-    let first = result.first().unwrap();
 
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
@@ -62,6 +65,7 @@ fn main() -> Result<()> {
 
     let mut dbg_app = App {
         menu_state: ListState::default().with_selected(Some(0)),
+        word_lenght: 5,
         ..Default::default()
     };
 
@@ -78,11 +82,15 @@ fn main() -> Result<()> {
                     match key.code {
                         // main keybind handler
                         KeyCode::Char('q') => break,
-                        KeyCode::Char('m') => *dbg_app.state.borrow_mut() = AS::MenuView,
+                        KeyCode::Char('m') => {
+                            dbg_app.state = AS::MenuView;
+                            dbg_app.menu_state.select(Some(0));
+                        }
                         _ => (),
                     }
                     match dbg_app.state {
                         AS::MenuView => menu_input_listener(key.code, &mut dbg_app),
+                        AS::BenchmarkView(_) => benchmarking_input_listener(key.code, &mut dbg_app),
                         _ => unimplemented!("MF"),
                     }
                 }
