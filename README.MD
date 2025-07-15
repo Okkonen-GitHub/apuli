@@ -16,21 +16,22 @@ Katso [NOTICE.MD](NOTICE.MD).
 - [x] Support for neluli
 - [x] Ranking system for guesses based roughly on information revealed by guess
 - [x] "Scouting" feature
-- [ ] Fix blue and orange generation in bench, ui, and possibly checking them in lib (in progess)
+- [ ] 🏗️ Fix blue and orange generation in bench, ui, and possibly checking them in lib (in progess)
+- [ ] Fix benchmarking
 - [ ] Apuli-dbg : a visual debugging app to ensure correctness of the algorithm
-- [ ] Reduce information in Apuli-ui and other optimizations (in progess)
+- [ ] 🏗️ Reduce information in Apuli-ui and other optimizations
   - [x] Show first n words
   - [ ] Show last n words (and dots in between)
-  - [ ] Let the use decide how many they want (1-100|all, 0-100)
+  - [ ] Let the user decide how many they want (1-100|all, 0-100)
     - If "all" show everything
     - Else show 1-100 best and 0-100 worst (remove duplicates)
     - Default: 25 and 3
-- [ ] Make the algorithm smarter by including stuff from information theory (rank, scout?)
-  - [x] Add rank_information to lib (and all subfunctionality)
-  - [ ] Make it visible in the UI (a 3rd mode)
+- [ ] 🏗️ Make the algorithm smarter by including stuff from information theory (rank, scout?)
+  - [x] Add information based algorithm to lib (based on <https://youtu.be/v68zYyaEmEA>)
+  - [x] Make it visible in the UI (a 3rd mode)
   - [ ] Benchmark information theory algorithm
-- [ ] Refactoring code (in progess)
-- [ ] Change colors with numbers (1-5)
+- [ ] 🏗️ Refactoring code
+- [ ] 🏗️ Change colors with numbers (1-5) 
 ## Apuli-ui
 
 Tarvitset ainakin trunk:in ja sen vaatimat jutut, jotka saat seuraavasti:
