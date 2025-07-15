@@ -118,7 +118,13 @@ pub fn help_modal(props: &HelpModalProps) -> Html {
             <span onmousedown={toggle_help} class="modal-close">{"✖"}</span>
             <p><i>{"Sanuli "}</i>{"apu"}</p>
             <p>{"Syötä arvauksia ja muuta kirjainten värit vastaamaan omaa sanuli peliäsi ja kone kertoo kaikki mahdolliset vaihtoehdot, jotka ovat jäljellä"}</p>
-
+            <p href="https://creativecommons.org/licenses/by/3.0/deed.fi">
+                {"Sanalistojen pohjana on käytetty Kotimaisten kielten keskuksen (Kotus) julkaiseman "}
+                <a href="https://creativecommons.org/licenses/by/3.0/deed.fi" class="link">
+                    { "CC Nimeä 3.0 Muokkaamaton" }
+                </a>
+                {"-lisensoidun nykysuomen sanalistan sanoja, joista on karsittu ja lisätty tarpeen."}
+            </p>
 
         </div>
     }
@@ -137,7 +143,7 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
     let toggle_answer = onmousedown!(callback, Msg::ToggleAnswer);
     let mngr = &mut props.tile_manager.clone();
     let oranges = mngr.gen_oranges();
-    let blues = mngr.gen_blues(oranges.as_ref());
+    let blues = mngr.gen_blues(/*oranges.as_ref()*/);
     let grays = mngr.gen_grays();
 
     let result = query(&grays, blues.as_ref(), oranges.as_ref(), props.word_length);
