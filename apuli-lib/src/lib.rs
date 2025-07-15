@@ -1,6 +1,9 @@
 #[cfg(test)]
 mod bench;
 
+// #[cfg(feature = "information")]
+mod information;
+
 pub mod apuli {
     use std::collections::HashMap;
 
