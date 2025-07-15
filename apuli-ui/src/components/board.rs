@@ -46,9 +46,13 @@ pub fn board(props: &Props) -> Html {
                                                     TileState::Orange => {state = "correct".into()}
                                                 }
                                                 new_state = tile.state.clone();
+                                            } if tile.character == *c && tile.state == TileState::Gray {
+                                                state = "absent".into();
+                                                new_state = TileState::Gray;
                                             }
-                                            
+                                                
                                         }
+                                        
                                         
                                         html! {
                                             <div class={format!("tile {}", state)} onclick={Callback::from(move |e: MouseEvent| {
