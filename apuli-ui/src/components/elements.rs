@@ -154,7 +154,7 @@ where
             html! {
                 <p class="answer">
                     // Should say "Bits" if score is in bits
-                    {index}{".  "}{word} <wbr/> {format!("  (VR:{score})") }
+                    {format!("{index}.  {word}")} <wbr/> {format!("  (VR:{score:.3})") }
                 </p>
             }
         })
@@ -288,8 +288,7 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                                                             html! {
                                                                                 <>
                                                                                 <p>
-                                                                                    {"Jäljellä: "}
-                                                                                    { remaining_entropy }
+                                                                                    { format!("Jäljellä: {remaining_entropy:.3}") }
                                                                                 </p>
                                                                                 { show_n_answers(ranked, 25, 3) }
                                                                                 </>
@@ -364,8 +363,7 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                         html! {
                                             <>
                                             <p>
-                                                {"Jäljellä: "}
-                                                { remaining_entropy }
+                                                { format!("Jäljellä: {remaining_entropy:.3}") }
                                             </p>
                                             { show_n_answers(ranked, 25, 3) }
                                             </>
