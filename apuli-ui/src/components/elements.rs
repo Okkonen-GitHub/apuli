@@ -112,7 +112,19 @@ pub fn help_modal(props: &HelpModalProps) -> Html {
         <div class="modal">
             <span onmousedown={toggle_help} class="modal-close">{"✖"}</span>
             <p>{"Apuli - Sanuli auttaja"}</p>
-            <p>{"Syötä arvauksia ja muuta kirjainten värit vastaamaan omaa sanuli peliäsi klikkailemallla kirjaimia. Kun olet syöttänyt arvaukset, algoritmi kertoo kaikki mahdolliset vaihtoehdot, jotka ovat jäljellä tai vaihtoehtoisesti sanan, joka paljastaa mahdollisimman paljon informaatiota."}</p>
+            <p>{"Syötä arvauksia ja muuta kirjainten värit vastaamaan omaa sanuli peliäsi klikkailemallla kirjaimia. Kun olet syöttänyt arvaukset, valittu algoritmi kertoo optimaalin seuraavan arvauksen."}</p>
+            <p>
+                {"Algoritmit:"}
+            </p>
+            <p>
+                {"Perus: Yksinkertainen, mutta nopea."}
+            </p>
+            <p>
+                {"Informaatio: Hitaampi, täysin matemaattinen algoritmi. Laskee kunkin arvauksen tuottaman informaation oletusarvon."}
+            </p>
+            <p>
+                {"Yhdistetty: Hitaampi algoritmi, joka etsii kaikkien sanojen joukosta ne, jotka sisältävät eniten yhteisiä kirjaimia."}
+            </p>
             <p>
                 {"Sanalistojen pohjana on käytetty Kotimaisten kielten keskuksen (Kotus) julkaiseman "}
                 <a href="https://creativecommons.org/licenses/by/3.0/deed.fi" class="link">
