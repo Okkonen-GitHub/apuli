@@ -128,21 +128,21 @@ fn main() {
         Some(oranges) => {
             match &blues {
                 Some(blues) => {
-                    query(grays, Some(blues), Some(oranges), word_length)
+                    query(&grays, Some(blues), Some(oranges), word_length)
                 },
                 None => {
-                    query(grays, None, Some(oranges), word_length)
+                    query(&grays, None, Some(oranges), word_length)
                 }
             }
         }
         None => {
             match &blues {
                 Some(blues) => {
-                    query(grays, Some(&blues), None, word_length)
+                    query(&grays, Some(&blues), None, word_length)
 
                 },
                 None => {
-                    query(grays, None, None, word_length)
+                    query(&grays, None, None, word_length)
                 }
             }
         }
