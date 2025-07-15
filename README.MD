@@ -30,7 +30,7 @@ Katso [NOTICE.MD](NOTICE.MD).
   - [ ] Make it visible in the UI (a 3rd mode)
   - [ ] Benchmark information theory algorithm
 - [ ] Refactoring code (in progess)
-
+- [ ] Change colors with numbers (1-5)
 ## Apuli-ui
 
 Tarvitset ainakin trunk:in ja sen vaatimat jutut, jotka saat seuraavasti:
