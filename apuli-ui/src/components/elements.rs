@@ -28,23 +28,16 @@ macro_rules! onmousedown {
 #[function_component(ToggleButton)]
 pub fn toggle_button(props: &ButtonProps) -> Html {
     let callback = props.callback.clone();
+    let onmousedown = onmousedown!(callback, Msg::ToggleAnswer);
 
     html! {
         <>
-        <div>
-            {{
-                let onmousedown = Callback::from(move |e: MouseEvent| {
-                                e.prevent_default();
-                                callback.emit(Msg::ToggleAnswer);
-                });
-                html! {
+            <div>
                 <button data-nosnippet="" class={classes!("btn", "correct")}
                                     onmousedown={onmousedown}>
                     { "VALMIS" }
                 </button>
-                }
-            }}
-        </div>
+            </div>
         </>
 
     }
@@ -53,23 +46,16 @@ pub fn toggle_button(props: &ButtonProps) -> Html {
 #[function_component(ClearButton)]
 pub fn clear_button(props: &ButtonProps) -> Html {
     let callback = props.callback.clone();
+    let onmousedown = onmousedown!(callback, Msg::Clear);
 
     html! {
         <>
-        <div>
-            {{
-                let onmousedown = Callback::from(move |e: MouseEvent| {
-                                e.prevent_default();
-                                callback.emit(Msg::Clear);
-                });
-                html! {
+            <div>
                 <button data-nosnippet="" class={classes!("btn", "present")}
                                     onmousedown={onmousedown}>
                     { "RESET" }
                 </button>
-                }
-            }}
-        </div>
+            </div>
         </>
 
     }
@@ -122,16 +108,18 @@ pub fn help_modal(props: &HelpModalProps) -> Html {
     html! {
         <div class="modal">
             <span onmousedown={toggle_help} class="modal-close">{"✖"}</span>
-            <p>{"Sanuli apu"}</p>
-            <p>{"Syötä arvauksia ja muuta kirjainten värit vastaamaan omaa sanuli peliäsi ja kone kertoo kaikki mahdolliset vaihtoehdot, jotka ovat jäljellä"}</p>
-            <p href="https://creativecommons.org/licenses/by/3.0/deed.fi">
+            <p>{"Apuli - Sanuli auttaja"}</p>
+            <p>{"Syötä arvauksia ja muuta kirjainten värit vastaamaan omaa sanuli peliäsi klikkailemallla kirjaimia. Kun olet syöttänyt arvaukset, algoritmi kertoo kaikki mahdolliset vaihtoehdot, jotka ovat jäljellä tai vaihtoehtoisesti sanan, joka paljastaa mahdollisimman paljon informaatiota."}</p>
+            <p>
                 {"Sanalistojen pohjana on käytetty Kotimaisten kielten keskuksen (Kotus) julkaiseman "}
                 <a href="https://creativecommons.org/licenses/by/3.0/deed.fi" class="link">
                     { "CC Nimeä 3.0 Muokkaamaton" }
                 </a>
-                {"-lisensoidun nykysuomen sanalistan sanoja, joista on karsittu ja lisätty tarpeen."}
+                {"-lisensoidun nykysuomen sanalistan sanoja, joista on karsittu ja lisätty tarpeen mukaan."}
             </p>
-
+            <div class="version">
+                <a class="version" href={"https://github.com/okkonen-github/apuli"} target="_blank">{"Apuli-dev | lähteet"}</a>
+            </div>
         </div>
     }
 }
@@ -275,9 +263,7 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
                                 let result = query(&grays, blues, oranges, props.word_length);
                                 if !props.show_combined {
                                     let ranked = rank(result);
-
                                     show_n_answers(ranked, 25)
-
                                 } else {
                                     let ranked = rank_scout(result, props.word_length);
                                     show_n_answers(ranked, 25)
