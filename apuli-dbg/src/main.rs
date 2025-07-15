@@ -9,10 +9,13 @@ use ratatui::{
     widgets::{ListState, Paragraph},
 };
 use std::{
+    borrow::BorrowMut,
     io::{stdout, Result},
     panic,
 };
 use views::menu::{menu_input_listener, menu_ui};
+
+use crate::views::benchmark::benchmarking_ui;
 
 mod views;
 
@@ -49,6 +52,7 @@ fn panic_handler() {
 
 fn main() -> Result<()> {
     panic_handler();
+    use AppState as AS;
     let result = query(&[], None, None, 5);
     let first = result.first().unwrap();
 
@@ -62,19 +66,25 @@ fn main() -> Result<()> {
     };
 
     loop {
-        term.draw(|frame| {
-            menu_ui(frame, &mut dbg_app);
+        term.draw(|frame| match &dbg_app.state {
+            AS::MenuView => menu_ui(frame, &mut dbg_app),
+            AS::BenchmarkView(_) => benchmarking_ui(frame, &mut dbg_app),
+            _ => unimplemented!("It's not ready"),
         })?;
 
         if event::poll(std::time::Duration::from_millis(16))? {
             if let event::Event::Key(key) = event::read()? {
-                if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q') {
-                    break;
-                }
-                use AppState as AS;
-                match dbg_app.state {
-                    AS::MenuView => menu_input_listener(key.code, &mut dbg_app),
-                    _ => unimplemented!("MF"),
+                if key.kind == KeyEventKind::Press {
+                    match key.code {
+                        // main keybind handler
+                        KeyCode::Char('q') => break,
+                        KeyCode::Char('m') => *dbg_app.state.borrow_mut() = AS::MenuView,
+                        _ => (),
+                    }
+                    match dbg_app.state {
+                        AS::MenuView => menu_input_listener(key.code, &mut dbg_app),
+                        _ => unimplemented!("MF"),
+                    }
                 }
             }
         }

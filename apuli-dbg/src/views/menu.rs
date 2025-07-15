@@ -9,7 +9,7 @@ const MAX_INDEX: usize = 4;
 
 pub(crate) fn menu_ui(frame: &mut Frame<'_>, app: &mut App) {
     let area = frame.size();
-    let block = Block::bordered().title("Choose action.").bg(Color::Black);
+    let block = Block::bordered().title("Choose action.").on_black();
     let popup_area = centered_rect(40, 40, area);
 
     let menu_items: [&str; MAX_INDEX] = ["Benchmark", "Filter", "Results", "Statistics"];
