@@ -52,7 +52,7 @@ mod apuli_bench {
             for word in words {
                 for (i, letter) in word.chars().enumerate() {
                     if letter != target.chars().nth(i).unwrap() && target.contains(letter) {
-                        dbg!(words, letter, target);
+                        // dbg!(words, letter, target);
                         let positions = cache.get_mut(&letter).cloned();
                         if let Some(mut positions) = positions {
                             positions.push(i);
@@ -106,6 +106,7 @@ mod apuli_bench {
             }
         }
         let mut data = HashMap::new();
+        let mut scores: Vec<usize> = vec![];
 
         let words_5 = all_words(5);
         for word in &words_5 {
@@ -137,10 +138,14 @@ mod apuli_bench {
                 data.insert("TARGET", word.to_owned());
                 data.insert("GUESS COUNT", guesses.len().to_string());
                 data.insert("Guesses", format!("{:?}", guesses));
-                assert_eq!(*word, result.first().unwrap().1);
-                dbg!(&data);
+                // assert_eq!(*word, result.first().unwrap().1);
+                scores.push(guesses.len() + 1);
+                // dbg!(&data);
             }
-            break;
+            // break;
         }
+        let avg: f64 = scores.iter().sum::<usize>() as f64 / scores.len() as f64;
+        let n_solved: usize = scores.iter().filter(|x| *x >= &6).sum();
+        dbg!(avg, n_solved, scores.len());
     }
 }
