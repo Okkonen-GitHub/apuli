@@ -25,6 +25,6 @@ members = [
 lto = true
 debug = false
 codegen-units = 1
-opt-level = 'z'
+opt-level = 3
 debug-assertions = false
 # strip = true # THIS breaks things in apuli-ui
