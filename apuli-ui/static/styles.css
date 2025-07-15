@@ -1,9 +1,7 @@
 :root {
-    /* --present: #c9b458; */
-    --present: #DCC664;
+    --present: #c9b458;
     --absent: #3e3e3e;
-    /* --correct: #6aaa64; */
-    --correct: #82E47A;
+    --correct: #6aaa64;
     --unknown: #818384;
     --background: #121212;
     --background-transparent: #12121200;
