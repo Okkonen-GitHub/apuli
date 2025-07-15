@@ -79,26 +79,26 @@ impl TileManager {
 
         // first the "ominous" ones
         for (index, tile) in self.tiles.clone().iter().enumerate() {
-            if let Some(oranges) = oranges {
-                for orange in oranges {
-                    if tile.state == TileState::Gray && tile.character == orange.letter {
-                        let mut positions = vec![0, 1, 2, 3, 4];
-                        let mut positions_to_be_removed = Vec::new();
-                        for pos in positions.clone() {
-                            if orange.positions.as_ref().unwrap().contains(&pos) {
-                                positions_to_be_removed.push(pos)
-                            }
-                        }
-                        positions.retain(|i| !positions_to_be_removed.contains(i));
-                        let blue = Letter {
-                            letter: tile.character,
-                            positions: Some(positions),
-                        };
-                        blues.push(blue);
-                        self.tiles.remove(index);
-                    }
-                }
-            }
+            // if let Some(oranges) = oranges {
+            //     for orange in oranges {
+            //         if tile.state == TileState::Gray && tile.character == orange.letter {
+            //             let mut positions = vec![0, 1, 2, 3, 4];
+            //             let mut positions_to_be_removed = Vec::new();
+            //             for pos in positions.clone() {
+            //                 if orange.positions.as_ref().unwrap().contains(&pos) {
+            //                     positions_to_be_removed.push(pos)
+            //                 }
+            //             }
+            //             positions.retain(|i| !positions_to_be_removed.contains(i));
+            //             let blue = Letter {
+            //                 letter: tile.character,
+            //                 positions: Some(positions),
+            //             };
+            //             blues.push(blue);
+            //             self.tiles.remove(index);
+            //         }
+            //     }
+            // }
             if tile.state == TileState::Blue {
                 let positions = cache.get_mut(&tile.character).cloned();
                 if let Some(mut positions) = positions {

@@ -1,4 +1,4 @@
-use crate::Msg;
+use crate::{Msg, cprint};
 use yew::prelude::*;
 
 use super::{manager::TileManager, game::Theme};
@@ -141,10 +141,11 @@ pub fn answer_modal(props: &AnswerModalProps) -> Html {
     let grays = mngr.gen_grays();
 
     let result = query(&grays, blues.as_ref(), oranges.as_ref(), props.word_length);
+    cprint(oranges); cprint(blues); cprint(grays);
 
     html! {
         <div class="modal">
-            <span onmousedown={toggle_answer} class="modal-close">{"✖"}</span>
+            <span onmousedown={toggle_answer} class="modal-close answer-modal">{"✖"}</span>
             {
             {
 

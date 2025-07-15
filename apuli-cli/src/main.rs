@@ -114,7 +114,7 @@ fn main() {
             }
         }
     }
-    println!("grays {:#?}", grays);
+    // println!("grays {:#?}", grays);
     // println!("blues {:#?}", blues);
     // println!("oranges {:#?}", oranges);
     // get input and then query
